@@ -1,0 +1,17 @@
+Package: bnotes
+Title: My R Notes
+Version: 0.1
+Date: 2017-11-21
+Authors@R: person("Brad", "Cannell", email = "brad.cannell@gmail.com", role = c("aut", "cre"))
+Description: This package contains random notes about R code and using R that I created for myself.
+  These notes didn't used to be in a package - they were just a folder full of random bits of code.
+  However, the intent behind putting them into a package is to create vignettes with my notes that I
+  can view from within RStudio even while I'm offline.
+Depends: R (>= 3.4.2)
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

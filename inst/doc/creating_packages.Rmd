@@ -1,0 +1,403 @@
+---
+title: "Creating Packages"
+author: "Brad Cannell"
+date: "Created: 2016-03-05 <br> Updated: `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Creating Packages}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+*******************************************************************************
+
+[//]: (Eventually, I may want to link to CSS and make this more attractive)
+
+### Some useful websites:
+<a href = "http://r-pkgs.had.co.nz" target = "_blank">Hadley's Wickham's Packages Book</a>   
+<a href = "http://rmflight.github.io/posts/2014/07/vignetteAnalysis.html" target = "_blank">Robert Flight's Blog</a>   
+<a href = "https://www.rstudio.com/resources/webinars/rstudio-essentials-webinar-series-programming-part-3/" target = "_blank">RStudio Tutorial</a>   
+
+*Using packages to create reporducable analyses*   
+This is proposed in the Robert Flight blog above. I played around with it, but have decided that it's better to do analysis as a project rather than a package.   
+
+* You can get most of the benefits of this technique - including Git and Packrat - using a project.   
+* Just share the entire project folder with a collaborator and / or post on Github.   
+* Packages require a bunch of extra work on the front end and are harder to keep up to date.   
+
+&nbsp;
+
+*******************************************************************************
+
+&nbsp;
+
+# Step 1: Create the package project
+Note that the devtools created package will pass CRAN tests, whereas the RStudio will not. However, because we're just getting started, and we don't plan to share this package on CRAN, we're just going to create this package using RStudio's built-in package creation utilities.   
+
+1. File > New Project
+
+2. New Directory > R Package
+
+3. Give the package a new ([Hadley's naming strategies](http://r-pkgs.had.co.nz/package.html))
+
+4. If you have R scripts written already, and wish to add them to the package, you can do so using the dialogue box titled "Create package based on source files"
+
+5. Check "Create a git repository" (You can add later)
+
+6. Check "Use packrat with this project" (You can add later)
+
+At this point RStudio should automatically open up the Rproj file we just created.   
+
+* Make sure you have the latest version of R, then run the following code to get the packages you’ll need:
+
+#### Do this everytime you create a new package
+
+```{r eval=FALSE}
+install.packages(c("devtools", "roxygen2", "testthat", "knitr"))
+```
+
+Use the following code to access new devtools functions as I develop them. This is particularly important during the development of the book.
+
+```{r eval=FALSE}
+devtools::install_github("hadley/devtools")
+library(devtools)
+has_devel()
+```
+
+&nbsp;
+
+*******************************************************************************
+
+&nbsp;
+
+
+
+
+# Step 2: Modify the description file
+
+Open the description file and make some changes. Here is an example:
+
+```{r eval=FALSE}
+Package: sandbox
+Type: Package
+Title: Test Stuff Out
+Version: 0.1
+Date: 2016-03-28
+Authors@R: person("Brad", "Cannell", email = "brad.cannell@gmail.com",
+  role = c("aut", "cre"))
+Maintainer: Brad Cannell <brad.cannell@gmail.com>
+URL: https://github.com/mbcann01/sandbox
+BugReports: https://github.com/mbcann01/sandbox/issues
+Description: This is just a sandbox for me to test out package stuff and
+  Github.
+License: MIT + file LICENSE
+LazyData: TRUE
+RoxygenNote: 5.0.1
+VignetteBuilder: knitr
+Depends: R (>= 3.2.3)
+Suggests:
+    knitr,
+    rmarkdown
+Imports:
+    dplyr
+```
+
+* Remember that Title Case is required for the Title
+
+* **Do Not** use `library(package)` in R scripts - instead add package dependencies to the `Imports` or `Remotes` field in the DESCRIPTION. **Do** use `library(package)` in vignette .Rmd files, and **do not** add these package dependencies to the DESCRIPTION
+
+* If we added R scripts to the package in Step 1, bullet 4 above, we need to open them now and make sure to remove all the library functions. Note that these R scripts are not linked to the original R scripts. In other words, if I make a change to props.R inside my package, those changes are reflected in the original props.R script.
+
+* If you use MIT license, remember to add the license file (without file extension) to the main package directory.
+
+* When adding CRAN packages to imports, you must first make sure they are installed.
+
+* <a href = "https://github.com/hadley/devtools/blob/master/vignettes/dependencies.Rmd" target = "_blank">Instructions for installing dependencies from sources other than CRAN are given here</a>.
+
+# Working with R scripts
+
+1. Don't write or alter your functions in the console as you would in a typical interactive session. If you do, it's easy for the version you're using interactively and the version you are actually including in your package to get out of sync. Instead, _load_ the package.
+
+2. Click the build tab > More > Load All, or `devtools::load_all`, or shift + cmd + L
+
+&nbsp;
+
+*******************************************************************************
+
+&nbsp;
+
+
+
+
+# Step 3: Writing help pages
+
+Help pages are contained in .Rd files saved in the man folder. It's best practice to use `roxygen` with your script files to automatically generate the .Rd files. Doing so helps to keep your scripts and your help pages in sync.
+
+To use roxygen:
+
+1. Make sure the R script you want to document is active.
+
+2. Click Project Options > Build Tools > Generate documentation with Roxygen
+
+3. Place your cursor in the function you want to document
+
+4. Insert a Roxygen skeleton with the keyboard shortcut cmd + alt + shift + R
+
+5. After you've filled in the skeleton click Build > More > Document, or use the keyboard shortcut shift + cmd + D. RStudio will then automatically generate the help pages in your man folder.
+
+6. Click the build tab > More > Load All, or `devtools::load_all`, or shift + cmd + L
+
+7. Check your help page by typing ?function_name in the console.
+
+#### Example `roxygen` header
+
+```{r eval = FALSE}
+#' @title Compact Table of Summary Statistics
+#'
+#' @description  Based on Stata's "tabstat" command. "tabstat displays summary
+#'  statistics for a series of numeric variables in one table.  It allows you
+#'  to specify the list of statistics to be displayed.  Statistics can be
+#'  calculated (conditioned on) another variable.  tabstat allows substantial
+#'  flexibility in terms of the statistics presented and the format of the
+#'  table" (Stata, 2016).
+#'
+#' @param x A continuous variable.
+#' @param digits Rounds the values returned to the specified number of decimal
+#'  places (default 3).
+#' @param stats Return specified statistics. Options include:
+#'  \describe{
+#'    \item{n}{Count of nonmissing values of x}
+#'    \item{nmiss}{Count of missing values of x}
+#'    \item{ci}{95 percent confidence interval for the mean of x}
+#'    \item{sum}{Sum of x}
+#'    \item{max}{Maximum value of x}
+#'    \item{min}{Minimum value of x}
+#'    \item{range}{(Maximum value of x) - (minimum value of x)}
+#'    \item{sd}{Standard deviation of x}
+#'    \item{var}{Variance of x}
+#'    \item{cv}{Coefficient of variation (sd / mean) of x}
+#'    \item{sem}{Standard error of the mean of x}
+#'    \item{skew}{Skewness of x}
+#'    \item{kurt}{Kurtosis of x}
+#'    \item{p1}{1st percentile of x}
+#'    \item{p5}{5th percentile of x}
+#'    \item{p10}{10th percentile of x}
+#'    \item{p25}{25th percentile of x}
+#'    \item{p50}{Median value of x}
+#'    \item{median}{Median value of x}
+#'    \item{p75}{75th percentile of x}
+#'    \item{p90}{90th percentile of x}
+#'    \item{p95}{95th percentile of x}
+#'    \item{p99}{99th percentile of x}
+#'    \item{iqr}{Interquartile range (p75 - p25)}
+#'    \item{q}{Equivalent to specifying p25 p50 p75}
+#'  }
+#'
+#' @return A data frame. By default, the data frame contains the variable name
+#'  and mean.
+#' @export
+#'
+#' @references Stata 14 help for tabstat
+#'  \url{http://www.stata.com/help.cgi?tabstat}
+#'
+#' @examples
+#' data(mtcars)
+#'
+#' # Single univariate analysis with Defaults
+#' tabstat(mtcars$mpg)
+#'
+#' # Single univariate analysis with all stats
+#' tabstat(mtcars$mpg, stats = c("n", "nmiss", "ci", "sum", "max", "min",
+#' "range", "sd", "var", "cv", "sem", "skew", "kurt", "p1", "p5", "p10",
+#' "p25", "p50", "median", "p75", "p90", "p95", "p99", "iqr", "q"))
+```
+
+&nbsp;
+
+#### Documenting Data:
+
+If you have included a data set, you must also document that data set. <a href = "http://r-pkgs.had.co.nz/data.html" target = "_blank">More information is available from Hadley here</a>.
+
+&nbsp;
+
+#### Documenting Package:
+
+You can use roxygen to provide a help page for your package as a whole. <a href = "http://r-pkgs.had.co.nz/man.html" target = "_blank">More information is available from Hadley here</a>.
+
+&nbsp;
+
+#### At this point, you have a usable package
+
+&nbsp;
+
+##### Once package is complete (ish)
+
+1. Update documentation (help pages). Build > More > Document, or shift + cmd + D.
+
+2. Check the package by clicking Build > Check. This will look for common package problems
+
+3. Click Build > Build & Reload. That will build the package and install it in your local package directory
+
+4. If you want to copy the package to send to someone else, click Build > More > Build source package. RStudio will build the package and save it as a .tar.gz file. You can then send it to another user to be installed on their system.
+
+5. If you are using GitHub, you need to commit changes and then push them to GitHub. More information about using Git and GitHub are available <a href = "http://r-pkgs.had.co.nz/git.html" target = "_blank">here</a>. Other users can install your package directly from GitHub with `install.packages("devtools")` followed by `devtools::install_github("username/packagename")`.
+
+&nbsp;
+
+#### Notes about package notes:   
+
+* Because packages are almost always a work in progress, you will want to add notes to yourself about the project in the source package that you don't want others to see. You can do this by creating a notes directory, and then listing that directory in `.Rbuildignore`. You can add to buildignore using `devtools::use_build_ignore("notes")`. More information is available [here](http://r-pkgs.had.co.nz/package.html).  
+
+* Currently, I'm not using a notes file to keep track of enhancements. Instead, I am converting enhancements to issues on GitHub. This is more like the workflow of a production program. However, each package has a notes text file just for me.
+
+&nbsp;
+
+*******************************************************************************
+
+&nbsp;
+
+
+
+
+# Step 4: Synchronize with GitHub
+
+Again, details are available in <a href = "http://r-pkgs.had.co.nz/git.html" target = "_blank">Hadley Wickham's Book</a>.   
+
+Note: to exculde files from add them to `.gitignore` manually, or by clicking Git > More > Ignore.
+
+1. If you didn't check "Create a git repository" in step 1, you'll need to create one now. Do so by clicking Project Options > Git/SVN > Version Control System.   
+
+2. May need to restart R
+
+3. [Create a README.md file](http://r-pkgs.had.co.nz/release.html#readme) (`devtools::use_readme_rmd()`)
+
+* Note: This only works if you set up the project as a package. Do this, even if you don't intend to create a package. There are just nice extra tools avaialable when you select project type > R Package.
+
+4. Create a new repo on GitHub: https://github.com/new. Give it the same name as your package, and include the package title as the repo description. Leave all the other options as is, then click Submit.   
+
+5. Open a shell, then type `git remote add origin https://github.com/mbcann01/dataclean.git`   
+
+6. Modify DESCRIPTION to add URL and BugReports fields that link to your new GitHub site.
+
+7. Save the file and commit (with the message “Updating DESCRIPTION to add links to GitHub site”)
+
+8. Open a shell, then type `git push -u origin master`
+
+9. Enter username `mbcann01` and password `asdf1234`
+
+10. Go to your GitHub page and look at the DESCRIPTION
+
+#### Example: Modify Description
+```{r eval = FALSE}
+URL: https://github.com/mbcann01/dataclean
+BugReports: https://github.com/mbcann01/dataclean/issues
+```
+
+#### Example Installation instructions for README:
+
+All files can be viewed directly on Github. To install this package locally, simply use `devtools`:
+
+```{r eval = FALSE}
+library(devtools)
+devtools::install_github("mbcann01/detectPilotTest")
+library(detectPilotTest)
+browseVignettes("detectPilotTest")
+```
+
+&nbsp;
+
+*******************************************************************************
+
+&nbsp;
+
+
+
+
+# Step 5: Testing
+
+Testing is an important part of programming. For detailed information on testing see the appropriate chapter in <a href = "http://r-pkgs.had.co.nz/tests.html" target = "_blank">Hadley Wickham's Book</a>.   
+
+Further guidance is available <a href = "https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf" target = "_blank">at the R Journal</a>.   
+
+Get started with `devtools::use_testthat()`.
+
+1. Create test file. Must be in `tests/testhat`. File name should start with test_ and the function name. For example, `test_check_catvars`.   
+
+2. Modify your code or tests   
+
+3. Test your package with Ctrl/Cmd + Shift + T or `devtools::test()`.   
+
+4. Repeat until all tests pass.
+
+&nbsp;
+
+*******************************************************************************
+
+&nbsp;
+
+
+
+
+# Step 6: Vignettes
+
+There are some great vignette resources on the internet: 
+
+* <a href = "http://r-pkgs.had.co.nz/vignettes.html" target = "_blank">Chapter on vignettes in Hadley's Package book</a>   
+
+* <a href = "ftp://cran.r-project.org/pub/R/doc/contrib/Leisch-CreatingPackages.pdf" target = "_blank">Leisch's creating R packages tutorial</a>   
+
+* <a href = "http://rmflight.github.io/posts/2014/07/vignetteAnalysis.html" target = "_blank">Flight's article on creating an analysis as a package and vignette</a>   
+
+&nbsp;
+
+To create a vignette:   
+
+* run `devtools::use_vignette("my-vignette")`
+
+* Open `vignettes/my-vignette.Rmd`
+
+* Create the vignette
+
+* Unlike R scripts, install and load packages directly in the vignettes.
+
+* Knit the vignette - The default action will be to create a version of the vignette that can be viewed in RStudio. However, `devtools::install_github()` (and friends) will not build vignettes by default because they’re time consuming and may require additional packages. So, in order to be able to view the vignette in RStudio, you must use vignettes = TRUE, e.g., devtools::install_github("brad-cannell/bfuncs", build_vignettes = TRUE) instead.
+
+* Use `devtools::build_vignettes()` to create an html version of the vignette in `inst/doc` that you can provide a link to on your Github README page. By default, these folders will be added to .gitignore. Remove them from .gitignore to be able to view/use them on Github. Create a rawgit version of the html vignette file, and providea link to it on README.
+
+* use use `devtools::build()` to create a package bundle with the vignettes included. RStudio’s “Build & reload” does not build vignettes to save time.
+
+* When you add or update vignettes, push to Github again.
+
+&nbsp;
+
+#### Vignette Notes:
+This builds the vignettes, and is probably fine for a regular package of functions. However, when using packages as a means for reproducible, self-contained analysis projects, the vignettes have greater importance, and by default are not easily accessible.   
+Need to find a way to make the vignettes more "front and center"   
+
+* Create a help page for the entire package that includes links to the vignettes?
+
+* Include links to the README.md file and upload to GitHub (with the data sets excluded)?
+
+* Remember to use `system.file()` when reading in data inside a code chunk. If you have trouble getting it to work, try build & reload.
+
+* To save a data frame to `data/` inside a vignette, you can use the <a href = "https://github.com/krlmlr/rprojroot" target = "_blank">rprojroot package</a>. use `rprojroot::find_root("DESCRIPTION")`
+
+&nbsp;
+
+*******************************************************************************
+
+&nbsp;
+
+
+
+
+# Still need to learn / add:  
+
+* Working with Rcpp to create faster code.

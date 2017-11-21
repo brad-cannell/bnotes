@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Brad Cannell" />
+
+
+<title>Creating Packages</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Creating Packages</h1>
+<h4 class="author"><em>Brad Cannell</em></h4>
+<h4 class="date"><em>Created: 2016-03-05 <br> Updated: 2017-11-21</em></h4>
+
+
+
+<hr />
+<div id="some-useful-websites" class="section level3">
+<h3>Some useful websites:</h3>
+<p><a href="http://r-pkgs.had.co.nz" target="_blank">Hadley’s Wickham’s Packages Book</a><br />
+<a href="http://rmflight.github.io/posts/2014/07/vignetteAnalysis.html" target="_blank">Robert Flight’s Blog</a><br />
+<a href="https://www.rstudio.com/resources/webinars/rstudio-essentials-webinar-series-programming-part-3/" target="_blank">RStudio Tutorial</a></p>
+<p><em>Using packages to create reporducable analyses</em><br />
+This is proposed in the Robert Flight blog above. I played around with it, but have decided that it’s better to do analysis as a project rather than a package.</p>
+<ul>
+<li>You can get most of the benefits of this technique - including Git and Packrat - using a project.<br />
+</li>
+<li>Just share the entire project folder with a collaborator and / or post on Github.<br />
+</li>
+<li>Packages require a bunch of extra work on the front end and are harder to keep up to date.</li>
+</ul>
+<p> </p>
+<hr />
+<p> </p>
+</div>
+<div id="step-1-create-the-package-project" class="section level1">
+<h1>Step 1: Create the package project</h1>
+<p>Note that the devtools created package will pass CRAN tests, whereas the RStudio will not. However, because we’re just getting started, and we don’t plan to share this package on CRAN, we’re just going to create this package using RStudio’s built-in package creation utilities.</p>
+<ol style="list-style-type: decimal">
+<li><p>File &gt; New Project</p></li>
+<li><p>New Directory &gt; R Package</p></li>
+<li><p>Give the package a new (<a href="http://r-pkgs.had.co.nz/package.html">Hadley’s naming strategies</a>)</p></li>
+<li><p>If you have R scripts written already, and wish to add them to the package, you can do so using the dialogue box titled “Create package based on source files”</p></li>
+<li><p>Check “Create a git repository” (You can add later)</p></li>
+<li><p>Check “Use packrat with this project” (You can add later)</p></li>
+</ol>
+<p>At this point RStudio should automatically open up the Rproj file we just created.</p>
+<ul>
+<li>Make sure you have the latest version of R, then run the following code to get the packages you’ll need:</li>
+</ul>
+<div id="do-this-everytime-you-create-a-new-package" class="section level4">
+<h4>Do this everytime you create a new package</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="kw">c</span>(<span class="st">&quot;devtools&quot;</span>, <span class="st">&quot;roxygen2&quot;</span>, <span class="st">&quot;testthat&quot;</span>, <span class="st">&quot;knitr&quot;</span>))</code></pre></div>
+<p>Use the following code to access new devtools functions as I develop them. This is particularly important during the development of the book.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;hadley/devtools&quot;</span>)
+<span class="kw">library</span>(devtools)
+<span class="kw">has_devel</span>()</code></pre></div>
+<p> </p>
+<hr />
+<p> </p>
+</div>
+</div>
+<div id="step-2-modify-the-description-file" class="section level1">
+<h1>Step 2: Modify the description file</h1>
+<p>Open the description file and make some changes. Here is an example:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Package<span class="op">:</span><span class="st"> </span>sandbox
+Type<span class="op">:</span><span class="st"> </span>Package
+Title<span class="op">:</span><span class="st"> </span>Test Stuff Out
+Version<span class="op">:</span><span class="st"> </span><span class="fl">0.1</span>
+Date<span class="op">:</span><span class="st"> </span><span class="dv">2016</span><span class="op">-</span><span class="dv">03</span><span class="op">-</span><span class="dv">28</span>
+Authors<span class="op">@</span>R<span class="op">:</span><span class="st"> </span><span class="kw">person</span>(<span class="st">&quot;Brad&quot;</span>, <span class="st">&quot;Cannell&quot;</span>, <span class="dt">email =</span> <span class="st">&quot;brad.cannell@gmail.com&quot;</span>,
+  <span class="dt">role =</span> <span class="kw">c</span>(<span class="st">&quot;aut&quot;</span>, <span class="st">&quot;cre&quot;</span>))
+Maintainer<span class="op">:</span><span class="st"> </span>Brad Cannell <span class="op">&lt;</span>brad.cannell<span class="op">@</span>gmail.com<span class="op">&gt;</span>
+URL<span class="op">:</span><span class="st"> </span>https<span class="op">:</span><span class="er">//</span>github.com<span class="op">/</span>mbcann01<span class="op">/</span>sandbox
+BugReports<span class="op">:</span><span class="st"> </span>https<span class="op">:</span><span class="er">//</span>github.com<span class="op">/</span>mbcann01<span class="op">/</span>sandbox<span class="op">/</span>issues
+Description<span class="op">:</span><span class="st"> </span>This is just a sandbox <span class="cf">for</span> me to test out package stuff and
+  Github.
+License<span class="op">:</span><span class="st"> </span>MIT <span class="op">+</span><span class="st"> </span>file LICENSE
+LazyData<span class="op">:</span><span class="st"> </span><span class="ot">TRUE</span>
+RoxygenNote<span class="op">:</span><span class="st"> </span><span class="fl">5.0</span>.<span class="dv">1</span>
+VignetteBuilder<span class="op">:</span><span class="st"> </span>knitr
+Depends<span class="op">:</span><span class="st"> </span><span class="kw">R</span> (<span class="op">&gt;=</span><span class="st"> </span><span class="fl">3.2</span>.<span class="dv">3</span>)
+Suggests<span class="op">:</span>
+<span class="st">    </span>knitr,
+    rmarkdown
+Imports<span class="op">:</span>
+<span class="st">    </span>dplyr</code></pre></div>
+<ul>
+<li><p>Remember that Title Case is required for the Title</p></li>
+<li><p><strong>Do Not</strong> use <code>library(package)</code> in R scripts - instead add package dependencies to the <code>Imports</code> or <code>Remotes</code> field in the DESCRIPTION. <strong>Do</strong> use <code>library(package)</code> in vignette .Rmd files, and <strong>do not</strong> add these package dependencies to the DESCRIPTION</p></li>
+<li><p>If we added R scripts to the package in Step 1, bullet 4 above, we need to open them now and make sure to remove all the library functions. Note that these R scripts are not linked to the original R scripts. In other words, if I make a change to props.R inside my package, those changes are reflected in the original props.R script.</p></li>
+<li><p>If you use MIT license, remember to add the license file (without file extension) to the main package directory.</p></li>
+<li><p>When adding CRAN packages to imports, you must first make sure they are installed.</p></li>
+<li><p><a href="https://github.com/hadley/devtools/blob/master/vignettes/dependencies.Rmd" target="_blank">Instructions for installing dependencies from sources other than CRAN are given here</a>.</p></li>
+</ul>
+</div>
+<div id="working-with-r-scripts" class="section level1">
+<h1>Working with R scripts</h1>
+<ol style="list-style-type: decimal">
+<li><p>Don’t write or alter your functions in the console as you would in a typical interactive session. If you do, it’s easy for the version you’re using interactively and the version you are actually including in your package to get out of sync. Instead, <em>load</em> the package.</p></li>
+<li><p>Click the build tab &gt; More &gt; Load All, or <code>devtools::load_all</code>, or shift + cmd + L</p></li>
+</ol>
+<p> </p>
+<hr />
+<p> </p>
+</div>
+<div id="step-3-writing-help-pages" class="section level1">
+<h1>Step 3: Writing help pages</h1>
+<p>Help pages are contained in .Rd files saved in the man folder. It’s best practice to use <code>roxygen</code> with your script files to automatically generate the .Rd files. Doing so helps to keep your scripts and your help pages in sync.</p>
+<p>To use roxygen:</p>
+<ol style="list-style-type: decimal">
+<li><p>Make sure the R script you want to document is active.</p></li>
+<li><p>Click Project Options &gt; Build Tools &gt; Generate documentation with Roxygen</p></li>
+<li><p>Place your cursor in the function you want to document</p></li>
+<li><p>Insert a Roxygen skeleton with the keyboard shortcut cmd + alt + shift + R</p></li>
+<li><p>After you’ve filled in the skeleton click Build &gt; More &gt; Document, or use the keyboard shortcut shift + cmd + D. RStudio will then automatically generate the help pages in your man folder.</p></li>
+<li><p>Click the build tab &gt; More &gt; Load All, or <code>devtools::load_all</code>, or shift + cmd + L</p></li>
+<li><p>Check your help page by typing ?function_name in the console.</p></li>
+</ol>
+<div id="example-roxygen-header" class="section level4">
+<h4>Example <code>roxygen</code> header</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#' @title Compact Table of Summary Statistics</span>
+<span class="co">#'</span>
+<span class="co">#' @description  Based on Stata's &quot;tabstat&quot; command. &quot;tabstat displays summary</span>
+<span class="co">#'  statistics for a series of numeric variables in one table.  It allows you</span>
+<span class="co">#'  to specify the list of statistics to be displayed.  Statistics can be</span>
+<span class="co">#'  calculated (conditioned on) another variable.  tabstat allows substantial</span>
+<span class="co">#'  flexibility in terms of the statistics presented and the format of the</span>
+<span class="co">#'  table&quot; (Stata, 2016).</span>
+<span class="co">#'</span>
+<span class="co">#' @param x A continuous variable.</span>
+<span class="co">#' @param digits Rounds the values returned to the specified number of decimal</span>
+<span class="co">#'  places (default 3).</span>
+<span class="co">#' @param stats Return specified statistics. Options include:</span>
+<span class="co">#'  \describe{</span>
+<span class="co">#'    \item{n}{Count of nonmissing values of x}</span>
+<span class="co">#'    \item{nmiss}{Count of missing values of x}</span>
+<span class="co">#'    \item{ci}{95 percent confidence interval for the mean of x}</span>
+<span class="co">#'    \item{sum}{Sum of x}</span>
+<span class="co">#'    \item{max}{Maximum value of x}</span>
+<span class="co">#'    \item{min}{Minimum value of x}</span>
+<span class="co">#'    \item{range}{(Maximum value of x) - (minimum value of x)}</span>
+<span class="co">#'    \item{sd}{Standard deviation of x}</span>
+<span class="co">#'    \item{var}{Variance of x}</span>
+<span class="co">#'    \item{cv}{Coefficient of variation (sd / mean) of x}</span>
+<span class="co">#'    \item{sem}{Standard error of the mean of x}</span>
+<span class="co">#'    \item{skew}{Skewness of x}</span>
+<span class="co">#'    \item{kurt}{Kurtosis of x}</span>
+<span class="co">#'    \item{p1}{1st percentile of x}</span>
+<span class="co">#'    \item{p5}{5th percentile of x}</span>
+<span class="co">#'    \item{p10}{10th percentile of x}</span>
+<span class="co">#'    \item{p25}{25th percentile of x}</span>
+<span class="co">#'    \item{p50}{Median value of x}</span>
+<span class="co">#'    \item{median}{Median value of x}</span>
+<span class="co">#'    \item{p75}{75th percentile of x}</span>
+<span class="co">#'    \item{p90}{90th percentile of x}</span>
+<span class="co">#'    \item{p95}{95th percentile of x}</span>
+<span class="co">#'    \item{p99}{99th percentile of x}</span>
+<span class="co">#'    \item{iqr}{Interquartile range (p75 - p25)}</span>
+<span class="co">#'    \item{q}{Equivalent to specifying p25 p50 p75}</span>
+<span class="co">#'  }</span>
+<span class="co">#'</span>
+<span class="co">#' @return A data frame. By default, the data frame contains the variable name</span>
+<span class="co">#'  and mean.</span>
+<span class="co">#' @export</span>
+<span class="co">#'</span>
+<span class="co">#' @references Stata 14 help for tabstat</span>
+<span class="co">#'  \url{http://www.stata.com/help.cgi?tabstat}</span>
+<span class="co">#'</span>
+<span class="co">#' @examples</span>
+<span class="co">#' data(mtcars)</span>
+<span class="co">#'</span>
+<span class="co">#' # Single univariate analysis with Defaults</span>
+<span class="co">#' tabstat(mtcars$mpg)</span>
+<span class="co">#'</span>
+<span class="co">#' # Single univariate analysis with all stats</span>
+<span class="co">#' tabstat(mtcars$mpg, stats = c(&quot;n&quot;, &quot;nmiss&quot;, &quot;ci&quot;, &quot;sum&quot;, &quot;max&quot;, &quot;min&quot;,</span>
+<span class="co">#' &quot;range&quot;, &quot;sd&quot;, &quot;var&quot;, &quot;cv&quot;, &quot;sem&quot;, &quot;skew&quot;, &quot;kurt&quot;, &quot;p1&quot;, &quot;p5&quot;, &quot;p10&quot;,</span>
+<span class="co">#' &quot;p25&quot;, &quot;p50&quot;, &quot;median&quot;, &quot;p75&quot;, &quot;p90&quot;, &quot;p95&quot;, &quot;p99&quot;, &quot;iqr&quot;, &quot;q&quot;))</span></code></pre></div>
+<p> </p>
+</div>
+<div id="documenting-data" class="section level4">
+<h4>Documenting Data:</h4>
+<p>If you have included a data set, you must also document that data set. <a href="http://r-pkgs.had.co.nz/data.html" target="_blank">More information is available from Hadley here</a>.</p>
+<p> </p>
+</div>
+<div id="documenting-package" class="section level4">
+<h4>Documenting Package:</h4>
+<p>You can use roxygen to provide a help page for your package as a whole. <a href="http://r-pkgs.had.co.nz/man.html" target="_blank">More information is available from Hadley here</a>.</p>
+<p> </p>
+</div>
+<div id="at-this-point-you-have-a-usable-package" class="section level4">
+<h4>At this point, you have a usable package</h4>
+<p> </p>
+<div id="once-package-is-complete-ish" class="section level5">
+<h5>Once package is complete (ish)</h5>
+<ol style="list-style-type: decimal">
+<li><p>Update documentation (help pages). Build &gt; More &gt; Document, or shift + cmd + D.</p></li>
+<li><p>Check the package by clicking Build &gt; Check. This will look for common package problems</p></li>
+<li><p>Click Build &gt; Build &amp; Reload. That will build the package and install it in your local package directory</p></li>
+<li><p>If you want to copy the package to send to someone else, click Build &gt; More &gt; Build source package. RStudio will build the package and save it as a .tar.gz file. You can then send it to another user to be installed on their system.</p></li>
+<li><p>If you are using GitHub, you need to commit changes and then push them to GitHub. More information about using Git and GitHub are available <a href="http://r-pkgs.had.co.nz/git.html" target="_blank">here</a>. Other users can install your package directly from GitHub with <code>install.packages(&quot;devtools&quot;)</code> followed by <code>devtools::install_github(&quot;username/packagename&quot;)</code>.</p></li>
+</ol>
+<p> </p>
+</div>
+</div>
+<div id="notes-about-package-notes" class="section level4">
+<h4>Notes about package notes:</h4>
+<ul>
+<li><p>Because packages are almost always a work in progress, you will want to add notes to yourself about the project in the source package that you don’t want others to see. You can do this by creating a notes directory, and then listing that directory in <code>.Rbuildignore</code>. You can add to buildignore using <code>devtools::use_build_ignore(&quot;notes&quot;)</code>. More information is available <a href="http://r-pkgs.had.co.nz/package.html">here</a>.</p></li>
+<li><p>Currently, I’m not using a notes file to keep track of enhancements. Instead, I am converting enhancements to issues on GitHub. This is more like the workflow of a production program. However, each package has a notes text file just for me.</p></li>
+</ul>
+<p> </p>
+<hr />
+<p> </p>
+</div>
+</div>
+<div id="step-4-synchronize-with-github" class="section level1">
+<h1>Step 4: Synchronize with GitHub</h1>
+<p>Again, details are available in <a href="http://r-pkgs.had.co.nz/git.html" target="_blank">Hadley Wickham’s Book</a>.</p>
+<p>Note: to exculde files from add them to <code>.gitignore</code> manually, or by clicking Git &gt; More &gt; Ignore.</p>
+<ol style="list-style-type: decimal">
+<li><p>If you didn’t check “Create a git repository” in step 1, you’ll need to create one now. Do so by clicking Project Options &gt; Git/SVN &gt; Version Control System.</p></li>
+<li><p>May need to restart R</p></li>
+<li><p><a href="http://r-pkgs.had.co.nz/release.html#readme">Create a README.md file</a> (<code>devtools::use_readme_rmd()</code>)</p></li>
+</ol>
+<ul>
+<li>Note: This only works if you set up the project as a package. Do this, even if you don’t intend to create a package. There are just nice extra tools avaialable when you select project type &gt; R Package.</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li><p>Create a new repo on GitHub: <a href="https://github.com/new" class="uri">https://github.com/new</a>. Give it the same name as your package, and include the package title as the repo description. Leave all the other options as is, then click Submit.</p></li>
+<li><p>Open a shell, then type <code>git remote add origin https://github.com/mbcann01/dataclean.git</code></p></li>
+<li><p>Modify DESCRIPTION to add URL and BugReports fields that link to your new GitHub site.</p></li>
+<li><p>Save the file and commit (with the message “Updating DESCRIPTION to add links to GitHub site”)</p></li>
+<li><p>Open a shell, then type <code>git push -u origin master</code></p></li>
+<li><p>Enter username <code>mbcann01</code> and password <code>asdf1234</code></p></li>
+<li><p>Go to your GitHub page and look at the DESCRIPTION</p></li>
+</ol>
+<div id="example-modify-description" class="section level4">
+<h4>Example: Modify Description</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">URL<span class="op">:</span><span class="st"> </span>https<span class="op">:</span><span class="er">//</span>github.com<span class="op">/</span>mbcann01<span class="op">/</span>dataclean
+BugReports<span class="op">:</span><span class="st"> </span>https<span class="op">:</span><span class="er">//</span>github.com<span class="op">/</span>mbcann01<span class="op">/</span>dataclean<span class="op">/</span>issues</code></pre></div>
+</div>
+<div id="example-installation-instructions-for-readme" class="section level4">
+<h4>Example Installation instructions for README:</h4>
+<p>All files can be viewed directly on Github. To install this package locally, simply use <code>devtools</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
+devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;mbcann01/detectPilotTest&quot;</span>)
+<span class="kw">library</span>(detectPilotTest)
+<span class="kw">browseVignettes</span>(<span class="st">&quot;detectPilotTest&quot;</span>)</code></pre></div>
+<p> </p>
+<hr />
+<p> </p>
+</div>
+</div>
+<div id="step-5-testing" class="section level1">
+<h1>Step 5: Testing</h1>
+<p>Testing is an important part of programming. For detailed information on testing see the appropriate chapter in <a href="http://r-pkgs.had.co.nz/tests.html" target="_blank">Hadley Wickham’s Book</a>.</p>
+<p>Further guidance is available <a href="https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Wickham.pdf" target="_blank">at the R Journal</a>.</p>
+<p>Get started with <code>devtools::use_testthat()</code>.</p>
+<ol style="list-style-type: decimal">
+<li><p>Create test file. Must be in <code>tests/testhat</code>. File name should start with test_ and the function name. For example, <code>test_check_catvars</code>.</p></li>
+<li><p>Modify your code or tests</p></li>
+<li><p>Test your package with Ctrl/Cmd + Shift + T or <code>devtools::test()</code>.</p></li>
+<li><p>Repeat until all tests pass.</p></li>
+</ol>
+<p> </p>
+<hr />
+<p> </p>
+</div>
+<div id="step-6-vignettes" class="section level1">
+<h1>Step 6: Vignettes</h1>
+<p>There are some great vignette resources on the internet:</p>
+<ul>
+<li><p><a href="http://r-pkgs.had.co.nz/vignettes.html" target="_blank">Chapter on vignettes in Hadley’s Package book</a></p></li>
+<li><p><a href="ftp://cran.r-project.org/pub/R/doc/contrib/Leisch-CreatingPackages.pdf" target="_blank">Leisch’s creating R packages tutorial</a></p></li>
+<li><p><a href="http://rmflight.github.io/posts/2014/07/vignetteAnalysis.html" target="_blank">Flight’s article on creating an analysis as a package and vignette</a></p></li>
+</ul>
+<p> </p>
+<p>To create a vignette:</p>
+<ul>
+<li><p>run <code>devtools::use_vignette(&quot;my-vignette&quot;)</code></p></li>
+<li><p>Open <code>vignettes/my-vignette.Rmd</code></p></li>
+<li><p>Create the vignette</p></li>
+<li><p>Unlike R scripts, install and load packages directly in the vignettes.</p></li>
+<li><p>Knit the vignette - The default action will be to create a version of the vignette that can be viewed in RStudio. However, <code>devtools::install_github()</code> (and friends) will not build vignettes by default because they’re time consuming and may require additional packages. So, in order to be able to view the vignette in RStudio, you must use vignettes = TRUE, e.g., devtools::install_github(“brad-cannell/bfuncs”, build_vignettes = TRUE) instead.</p></li>
+<li><p>Use <code>devtools::build_vignettes()</code> to create an html version of the vignette in <code>inst/doc</code> that you can provide a link to on your Github README page. By default, these folders will be added to .gitignore. Remove them from .gitignore to be able to view/use them on Github. Create a rawgit version of the html vignette file, and providea link to it on README.</p></li>
+<li><p>use use <code>devtools::build()</code> to create a package bundle with the vignettes included. RStudio’s “Build &amp; reload” does not build vignettes to save time.</p></li>
+<li><p>When you add or update vignettes, push to Github again.</p></li>
+</ul>
+<p> </p>
+<div id="vignette-notes" class="section level4">
+<h4>Vignette Notes:</h4>
+<p>This builds the vignettes, and is probably fine for a regular package of functions. However, when using packages as a means for reproducible, self-contained analysis projects, the vignettes have greater importance, and by default are not easily accessible.<br />
+Need to find a way to make the vignettes more “front and center”</p>
+<ul>
+<li><p>Create a help page for the entire package that includes links to the vignettes?</p></li>
+<li><p>Include links to the README.md file and upload to GitHub (with the data sets excluded)?</p></li>
+<li><p>Remember to use <code>system.file()</code> when reading in data inside a code chunk. If you have trouble getting it to work, try build &amp; reload.</p></li>
+<li><p>To save a data frame to <code>data/</code> inside a vignette, you can use the <a href="https://github.com/krlmlr/rprojroot" target="_blank">rprojroot package</a>. use <code>rprojroot::find_root(&quot;DESCRIPTION&quot;)</code></p></li>
+</ul>
+<p> </p>
+<hr />
+<p> </p>
+</div>
+</div>
+<div id="still-need-to-learn-add" class="section level1">
+<h1>Still need to learn / add:</h1>
+<ul>
+<li>Working with Rcpp to create faster code.</li>
+</ul>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
