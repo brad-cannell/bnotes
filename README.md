@@ -23,5 +23,5 @@ In addition to creating vignettes that can be viewed inside of RStudio, I also c
 # Installation instructions:
 
 ``` r
-devtools::install_github("brad-cannell/bfuncs", build_vignettes = TRUE)
+devtools::install_github("brad-cannell/bnotes", build_vignettes = TRUE)
 ```
