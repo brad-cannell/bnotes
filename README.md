@@ -20,6 +20,8 @@ In addition to creating vignettes that can be viewed inside of RStudio, I also c
 
 ## Presentation and dissemination vignettes
 
+* [Table of Contents in markdown files](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/table_of_contents.html)
+
 # Installation instructions:
 
 ``` r
