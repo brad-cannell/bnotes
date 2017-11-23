@@ -12,6 +12,8 @@ In addition to creating vignettes that can be viewed inside of RStudio, I also c
 
 * [Creating packages](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/creating_packages.html)
 
+* [Tidy evaluation: Prgraming with dplyr](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/tidy_evaluation.html)
+
 ## Simulation vignettes
 
 ## Data wrangling vignettes

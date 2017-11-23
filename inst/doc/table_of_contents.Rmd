@@ -1,0 +1,119 @@
+---
+title: "Table of Contents"
+author: "Brad Cannell"
+date: "Created: 2017-07-26 <br> Updated: `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+I often want to create a table of contents at the top of an html (markdown) document that allows me to quickly jump to a specific section of the page.
+ 
+# Table of Contents {#top}
+
+# Table of Contents 2 {#toc}
+
+-------------------------------------------------------------------------------
+
+1. [Introduction](#intro)
+
+2. [Methods](#methods)
+
+3. [Results](#results)
+
+4. [Conclusions](#conclusions)
+
+
+**Remember: You must put a horizonal rule after headings**
+
+If you don't, links and bullets won't work properly.
+
+**To set an attribute** use curly braces.
+
+**To link to an attribute** use brackets and parentheses
+
+**Weird little quirk** about adding attributes (ids) to headers. If you use the id #toc, in the underlying html Pandoc will automatically change it to table-of-contents.
+
+Above, I create one header with the #toc id and one with the #top id. Below, the introduction and methods sections are linked to #table-of-contents. This seems to work fine.
+
+**Weird little quirk number 2.** It looks like #top has a special meaning as well. Above, I have another header with the #top id. The results section below is linked to the #top id. However, when you render this page and click the "Top" link, it jumps to the top of the page, not to the header I created.
+
+**Weird little quirk number 3.** It looks like you don't even have to set an id attribute using curly braces. Every time you create a header, markdown will automatically create a new div with an id that is the same as the header name, set to lower case, with dashes in place of spaces. For example:
+
+Header 1 should automatically be given a div with an id = header-1. You should be able to link to that header using `[My first section](#header-1)`
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------
+
+<H2 id = "intro">
+Introduction
+</H2>
+
+-------------------------------------------------------------------------------
+
+[TOC](#table-of-contents)
+
+Here is my introduction section...
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------
+
+<H2 id = "methods">
+Methods
+</H2>
+
+[TOC](#table-of-contents)
+
+-------------------------------------------------------------------------------
+
+
+Here is my methods section...
+
+Left the link above broken on purpose for illustration.
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------
+
+## Results {#results}
+
+-------------------------------------------------------------------------------
+
+[TOC](#top)
+
+Notice here I use #top instead of #table-of-contents
+
+---
+
+```{r echo=FALSE}
+sessionInfo()
+```

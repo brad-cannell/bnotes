@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Brad Cannell" />
+
+
+<title>Tidy Evaluation</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Tidy Evaluation</h1>
+<h4 class="author"><em>Brad Cannell</em></h4>
+<h4 class="date"><em>Created: 2017-06-24 <br> Updated: 2017-11-23</em></h4>
+
+
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
+<span class="co">#&gt; ── Attaching packages ─────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</span>
+<span class="co">#&gt; ✔ ggplot2 2.2.1     ✔ purrr   0.2.4</span>
+<span class="co">#&gt; ✔ tibble  1.3.4     ✔ dplyr   0.7.4</span>
+<span class="co">#&gt; ✔ tidyr   0.7.2     ✔ stringr 1.2.0</span>
+<span class="co">#&gt; ✔ readr   1.1.1     ✔ forcats 0.2.0</span>
+<span class="co">#&gt; ── Conflicts ────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──</span>
+<span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span>
+<span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span>
+<span class="kw">data</span>(<span class="st">&quot;starwars&quot;</span>)</code></pre></div>
+<H2 id="toc">
+Table of Contents
+</H2>
+<hr />
+<ol style="list-style-type: decimal">
+<li><p><a href="#introduction">Introduction</a></p></li>
+<li><p><a href="#key_functions">Key functions</a></p></li>
+<li><p><a href="#for_loop">Example for loop</a></p></li>
+<li><p><a href="#functions">Example user-defined function</a></p></li>
+<li><p><a href="#quirks">Other Quirks and Lessons Learned</a></p></li>
+</ol>
+<hr />
+<H2 id="introduction">
+Overview of Tidy Eval
+</H2>
+<hr />
+<p><a href="#toc">TOC</a></p>
+<ul>
+<li><p>Useful website: <a href="http://dplyr.tidyverse.org/articles/programming.html" class="uri">http://dplyr.tidyverse.org/articles/programming.html</a></p></li>
+<li><p><strong>Tidy Eval</strong> is as system for <strong>programming</strong>, as opposed to working interactively, with <strong>dplyr</strong>.</p></li>
+<li><p>Tidy Eval is all about <strong>quoting</strong>. Not in the <code>&quot;&quot;</code> sense, which is to create a character string. Rather, Quoting is the action of capturing an expression instead of evaluating it. This is similar to the way formulas work in R. For example:</p></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Computing the value of the expression:</span>
+<span class="kw">toupper</span>(letters[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])
+<span class="co">#&gt; [1] &quot;A&quot; &quot;B&quot; &quot;C&quot; &quot;D&quot; &quot;E&quot;</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Capturing the expression:</span>
+<span class="kw">quote</span>(<span class="kw">toupper</span>(letters[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]))
+<span class="co">#&gt; toupper(letters[1:5])</span></code></pre></div>
+<ul>
+<li><strong>Don’t forget:</strong> When using quoted expressions, or <strong>quotures</strong> inside functions, you must <strong>unquote</strong> them where you want the expression evaluated. You can unquote with <code>!!</code> or unquote-splice with <code>!!!</code>.</li>
+</ul>
+<hr />
+<H2 id="key_functions">
+Key Functions
+</H2>
+<hr />
+<p><a href="#toc">TOC</a></p>
+<ul>
+<li><p><code>.data</code> pronoun</p>
+<ul>
+<li><p>Test bullet.</p></li>
+<li><p>Not officially part of Tidy Eval (part of rlang).</p></li>
+<li><p>However, useful to keep in mind in situations where you might be programming over multiple data frames. If you’re in that situation, go check out the <em>Pragramming with dplyr</em> link above for more details.</p></li>
+</ul></li>
+<li><p><code>quo()</code></p>
+<ul>
+<li><p>This is sort of the foundational function in Tidy Eval. It creates a class <strong>quoture</strong> object, which is a special type of formula.</p></li>
+<li><p>quo() captures expressions when outside of user-defined functions.</p></li>
+</ul></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What does quo() return?</span>
+<span class="kw">quo</span>(species) <span class="co"># Where species is a variable in the Starwars tibble</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~species</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Basic usage of quo() in function</span>
+freq_table &lt;-<span class="st"> </span><span class="cf">function</span>(df, x, ...) {
+  df <span class="op">%&gt;%</span><span class="st">                             </span><span class="co"># No quoting and unquoting necessary for the tibble</span>
+<span class="st">    </span><span class="kw">group_by</span>(<span class="op">!!</span>x) <span class="op">%&gt;%</span><span class="st">                </span><span class="co"># Don't forget to unquote (!!) where you want the quoture evaluated</span>
+<span class="st">    </span><span class="kw">summarise</span>(<span class="dt">N =</span> <span class="kw">n</span>()) <span class="op">%&gt;%</span><span class="st">           </span><span class="co"># Calculate freq</span>
+<span class="st">    </span><span class="kw">top_n</span>(<span class="dv">3</span>, N)                      <span class="co"># Return top 3 results</span>
+}
+
+<span class="kw">freq_table</span>(<span class="dt">df =</span> starwars, <span class="dt">x =</span> <span class="kw">quo</span>(species))
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   species     N</span>
+<span class="co">#&gt;     &lt;chr&gt; &lt;int&gt;</span>
+<span class="co">#&gt; 1   Droid     5</span>
+<span class="co">#&gt; 2   Human    35</span>
+<span class="co">#&gt; 3    &lt;NA&gt;     5</span></code></pre></div>
+<ul>
+<li><p><code>enquo()</code></p>
+<ul>
+<li>If you don’t want the user of your function to be able to pass the variable name as an argument without wrapping in <code>quo()</code>, that’s where <code>enquo()</code> comes in.</li>
+</ul></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Basic usage of enquo() in function</span>
+freq_table &lt;-<span class="st"> </span><span class="cf">function</span>(df, x, ...) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(x)                      <span class="co"># Capturing function argument and turning it into a quoture</span>
+  df <span class="op">%&gt;%</span><span class="st">                             </span>
+<span class="st">    </span><span class="kw">group_by</span>(<span class="op">!!</span>x) <span class="op">%&gt;%</span><span class="st">                </span>
+<span class="st">    </span><span class="kw">summarise</span>(<span class="dt">N =</span> <span class="kw">n</span>()) <span class="op">%&gt;%</span><span class="st">           </span>
+<span class="st">    </span><span class="kw">top_n</span>(<span class="dv">3</span>, N)                      
+}
+
+<span class="kw">freq_table</span>(<span class="dt">df =</span> starwars, <span class="dt">x =</span> species) <span class="co"># Notice we no longer need to wrop species with quo()</span>
+<span class="co">#&gt; # A tibble: 3 x 2</span>
+<span class="co">#&gt;   species     N</span>
+<span class="co">#&gt;     &lt;chr&gt; &lt;int&gt;</span>
+<span class="co">#&gt; 1   Droid     5</span>
+<span class="co">#&gt; 2   Human    35</span>
+<span class="co">#&gt; 3    &lt;NA&gt;     5</span></code></pre></div>
+<ul>
+<li><p><code>quos()</code></p>
+<ul>
+<li><p>Use <code>quos()</code> with <code>...</code> when you want to pass multiple variables / arguments / expressions into your function.</p></li>
+<li><p>Must unquote-splice <code>!!!</code> in your function to evaluate.</p></li>
+</ul></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What does quos() return?</span>
+<span class="kw">quos</span>(species, name) <span class="co"># Where species and name are variables in the Starwars tibble</span>
+<span class="co">#&gt; [[1]]</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~species</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[2]]</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~name</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; attr(,&quot;class&quot;)</span>
+<span class="co">#&gt; [1] &quot;quosures&quot;</span></code></pre></div>
+<p>You can iterate over the list of quotures returned by <code>quos()</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_quos &lt;-<span class="st"> </span><span class="kw">quos</span>(species, name)
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(my_quos)) {
+  <span class="kw">print</span>(my_quos[[i]])
+}
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~species</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~name</span></code></pre></div>
+<p>Don’t forget to unquote-splice with <code>!!!</code></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Basic use of quos() in a for loop</span>
+my_quos &lt;-<span class="st"> </span><span class="kw">quos</span>(species, name)
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(my_quos)) {
+  <span class="kw">summarise</span>(starwars, <span class="dt">n_miss =</span> <span class="kw">sum</span>(<span class="kw">is.na</span>(<span class="op">!!</span>my_quos[[i]]))) <span class="op">%&gt;%</span><span class="st"> </span>print <span class="co"># Can use !! or !!! in this case</span>
+}
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;   n_miss</span>
+<span class="co">#&gt;    &lt;int&gt;</span>
+<span class="co">#&gt; 1      5</span>
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;   n_miss</span>
+<span class="co">#&gt;    &lt;int&gt;</span>
+<span class="co">#&gt; 1      0</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Basic usage of quos() in function</span>
+freq_table &lt;-<span class="st"> </span><span class="cf">function</span>(df, ...) {    <span class="co"># Notice we dropped the &quot;x&quot; argument</span>
+  x &lt;-<span class="st"> </span><span class="kw">quos</span>(...)                     <span class="co"># Capturing function argument and turning it into a quoture list</span>
+  df <span class="op">%&gt;%</span><span class="st">                             </span>
+<span class="st">    </span><span class="kw">group_by</span>(<span class="op">!!!</span>x) <span class="op">%&gt;%</span><span class="st">               </span><span class="co"># Must use unquote-splice (!!!) in this case</span>
+<span class="st">    </span><span class="kw">summarise</span>(<span class="dt">N =</span> <span class="kw">n</span>()) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">slice</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)                      
+}
+
+<span class="kw">freq_table</span>(<span class="dt">df =</span> starwars, species, hair_color)
+<span class="co">#&gt; # A tibble: 5 x 3</span>
+<span class="co">#&gt;    species hair_color     N</span>
+<span class="co">#&gt;      &lt;chr&gt;      &lt;chr&gt; &lt;int&gt;</span>
+<span class="co">#&gt; 1   Aleena       none     1</span>
+<span class="co">#&gt; 2 Besalisk       none     1</span>
+<span class="co">#&gt; 3   Cerean      white     1</span>
+<span class="co">#&gt; 4 Chagrian       none     1</span>
+<span class="co">#&gt; 5 Clawdite     blonde     1</span></code></pre></div>
+<ul>
+<li><p><code>quo_name()</code></p>
+<ul>
+<li>Sometimes we want to convert the argument to a string for use in our function output. For example, we may want to dynamically create variable names inside the function.</li>
+</ul></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What does quo_name return?</span>
+<span class="kw">quo_name</span>(<span class="st">&quot;height&quot;</span>) <span class="co"># Input must be a string or a quoture</span>
+<span class="co">#&gt; [1] &quot;height&quot;</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What does quo_name return?</span>
+height &lt;-<span class="st"> </span><span class="kw">quo</span>(height)
+<span class="kw">quo_name</span>(height) <span class="co"># Input must be a string or a quoture</span>
+<span class="co">#&gt; [1] &quot;height&quot;</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Basic usage of quos() in function</span>
+continuous_table &lt;-<span class="st"> </span><span class="cf">function</span>(df, x) {
+  x2 &lt;-<span class="st"> </span><span class="kw">enquo</span>(x)                             <span class="co"># Must enquo first</span>
+  mean_name &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;mean_&quot;</span>, <span class="kw">quo_name</span>(x2))
+  sum_name  &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;sum_&quot;</span>, <span class="kw">quo_name</span>(x2))
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarise</span>(
+      <span class="op">!!</span>mean_name <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="kw">mean</span>(<span class="op">!!</span>x2, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="co"># Must use !! and := to set the variable names</span>
+      <span class="op">!!</span>sum_name  <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="kw">sum</span>(<span class="op">!!</span>x2, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+    )
+}
+
+<span class="kw">continuous_table</span>(starwars, height)
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   mean_height sum_height</span>
+<span class="co">#&gt;         &lt;dbl&gt;      &lt;int&gt;</span>
+<span class="co">#&gt; 1     174.358      14123</span></code></pre></div>
+<hr />
+<H2 id="for_loop">
+Example using Tidy Eval in For Loop
+</H2>
+<hr />
+<p><a href="#toc">TOC</a></p>
+<p>In this example, I’m creating a table of summary statistics using the Starwars data. The table will compare some simple characteristics of the characters by species.</p>
+<p>First, I’m going to reclassify every character as Human or Not Human</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">starwars &lt;-<span class="st"> </span><span class="kw">mutate</span>(starwars, <span class="dt">human =</span> <span class="kw">if_else</span>(species <span class="op">==</span><span class="st"> &quot;Human&quot;</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>, <span class="ot">NA_character_</span>))</code></pre></div>
+<p>Now I’m going to create the table shell</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars =<span class="st"> </span><span class="dv">3</span>        <span class="co"># Number of vars</span>
+rows =<span class="st"> </span>vars <span class="op">+</span><span class="st"> </span><span class="dv">1</span> <span class="co"># Additional row for group sample size</span>
+table &lt;-<span class="st"> </span><span class="kw">tibble</span>(
+  <span class="dt">Variable =</span> <span class="kw">vector</span>(<span class="dt">mode =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">length =</span> rows),
+  <span class="dt">Human =</span> <span class="kw">vector</span>(<span class="dt">mode =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">length =</span> rows),
+  <span class="st">`</span><span class="dt">Not Human</span><span class="st">`</span> =<span class="st"> </span><span class="kw">vector</span>(<span class="dt">mode =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">length =</span> rows)
+)
+
+<span class="co"># N for Human</span>
+table[<span class="dv">1</span>, <span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(
+  <span class="st">&quot;(N = &quot;</span>,
+  <span class="kw">filter</span>(starwars, human <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">format</span>(<span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>),
+  <span class="st">&quot;)&quot;</span>
+)
+
+<span class="co"># N for Not Human</span>
+table[<span class="dv">1</span>, <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(
+  <span class="st">&quot;(N = &quot;</span>,
+  <span class="kw">filter</span>(starwars, human <span class="op">==</span><span class="st"> &quot;No&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">format</span>(<span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>),
+  <span class="st">&quot;)&quot;</span>
+)</code></pre></div>
+<p>Finally, I’ll fill in the table using a for loop. In this case, I just want to compare the mean height, mass, and birth year of humans and non-humans.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">quo</span>(height), <span class="kw">quo</span>(mass), <span class="kw">quo</span>(birth_year)) <span class="co"># Create vector of quotures for variables of interest</span>
+
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(vars)) {
+  table[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, ] &lt;-<span class="st"> </span>starwars <span class="op">%&gt;%</span><span class="st">                             </span><span class="co"># Chunk of table to receive loop output</span>
+<span class="st">    </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(human)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">group_by</span>(human) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarise</span>(<span class="dt">Mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>vars[[i]], <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)) <span class="op">%&gt;%</span><span class="st">    </span><span class="co"># Use !! with vars[[i]]</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Mean =</span> <span class="kw">round</span>(Mean, <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">format</span>(<span class="dt">nsmall =</span> <span class="dv">1</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">spread</span>(human, Mean) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Variable =</span> <span class="kw">quo_name</span>(vars[[i]])) <span class="op">%&gt;%</span><span class="st">               </span><span class="co"># Use quo_name to get variable name for first column</span>
+<span class="st">    </span><span class="kw">select</span>(Variable, Yes, No)
+}</code></pre></div>
+<p>This works! How can I keep from having to type quo around every variable?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars &lt;-<span class="st"> </span><span class="kw">quos</span>(height, mass, birth_year)
+
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(vars)) {
+  table[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>, ] &lt;-<span class="st"> </span>starwars <span class="op">%&gt;%</span><span class="st">                             </span><span class="co"># Chunk of table to receive loop output</span>
+<span class="st">    </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(human)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">group_by</span>(human) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarise</span>(<span class="dt">Mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>vars[[i]], <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)) <span class="op">%&gt;%</span><span class="st">    </span><span class="co"># Use !! with vars[[i]]</span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Mean =</span> <span class="kw">round</span>(Mean, <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">format</span>(<span class="dt">nsmall =</span> <span class="dv">1</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">spread</span>(human, Mean) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Variable =</span> <span class="kw">quo_name</span>(vars[[i]])) <span class="op">%&gt;%</span><span class="st">               </span><span class="co"># Use quo_name to get variable name for first column</span>
+<span class="st">    </span><span class="kw">select</span>(Variable, Yes, No)
+}</code></pre></div>
+<hr />
+<H2 id="functions">
+Example using Tidy Eval in Functions
+</H2>
+<hr />
+<p><a href="#toc">TOC</a></p>
+<p>In this example, I’m creating a table of summary statistics using the Starwars data. The table will compare some simple characteristics of the characters by species.</p>
+<p>First, I’m going to reclassify every character as Human or Not Human</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">starwars &lt;-<span class="st"> </span><span class="kw">mutate</span>(starwars, <span class="dt">human =</span> <span class="kw">if_else</span>(species <span class="op">==</span><span class="st"> &quot;Human&quot;</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>, <span class="ot">NA_character_</span>))</code></pre></div>
+<p>Now I’m going to create the table shell</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars =<span class="st"> </span><span class="dv">3</span>        <span class="co"># Number of vars</span>
+rows =<span class="st"> </span>vars <span class="op">+</span><span class="st"> </span><span class="dv">1</span> <span class="co"># Additional row for group sample size</span>
+table &lt;-<span class="st"> </span><span class="kw">tibble</span>(
+  <span class="dt">Variable =</span> <span class="kw">vector</span>(<span class="dt">mode =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">length =</span> rows),
+  <span class="dt">Human =</span> <span class="kw">vector</span>(<span class="dt">mode =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">length =</span> rows),
+  <span class="st">`</span><span class="dt">Not Human</span><span class="st">`</span> =<span class="st"> </span><span class="kw">vector</span>(<span class="dt">mode =</span> <span class="st">&quot;character&quot;</span>, <span class="dt">length =</span> rows)
+)
+
+<span class="co"># N for Human</span>
+table[<span class="dv">1</span>, <span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(
+  <span class="st">&quot;(N = &quot;</span>,
+  <span class="kw">filter</span>(starwars, human <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">format</span>(<span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>),
+  <span class="st">&quot;)&quot;</span>
+)
+
+<span class="co"># N for Not Human</span>
+table[<span class="dv">1</span>, <span class="dv">3</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(
+  <span class="st">&quot;(N = &quot;</span>,
+  <span class="kw">filter</span>(starwars, human <span class="op">==</span><span class="st"> &quot;No&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">nrow</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">format</span>(<span class="dt">big.mark =</span> <span class="st">&quot;,&quot;</span>),
+  <span class="st">&quot;)&quot;</span>
+)</code></pre></div>
+<p>Finally, I’ll fill in the table using a user-defined function. In this case, I just want to compare the mean height, mass, and birth year of humans and non-humans.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_stats &lt;-<span class="st"> </span><span class="cf">function</span>(...) {
+  vars &lt;-<span class="st"> </span><span class="kw">quos</span>(...)                                           <span class="co"># Creates a list of quotures from variable names</span>
+  temp &lt;-<span class="st"> </span><span class="kw">get</span>(<span class="st">&quot;table&quot;</span>)                                        <span class="co"># Grabs a copy of the table shell from the environment</span>
+  temp &lt;-<span class="st"> </span>temp[<span class="dv">0</span>, ]                                           <span class="co"># Only keep the column headers</span>
+  
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(vars)) {                                 <span class="co"># Loop over all variables in ...</span>
+    out &lt;-<span class="st"> </span><span class="kw">quo</span>(<span class="op">!!</span>vars[[i]])                                   <span class="co"># Not necessary, but makes more readable.</span>
+    name &lt;-<span class="st"> </span><span class="kw">quo_name</span>(out)                                     <span class="co"># Turns variable name into string for mutate below.</span>
+    row &lt;-<span class="st"> </span>starwars <span class="op">%&gt;%</span><span class="st">                                       </span><span class="co"># Creates a single row of stats for the table.</span>
+<span class="st">      </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(human)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">group_by</span>(human) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">summarise</span>(<span class="dt">Mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>out, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)) <span class="op">%&gt;%</span><span class="st">         </span><span class="co"># Still need !!</span>
+<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">Mean =</span> <span class="kw">round</span>(Mean, <span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">format</span>(<span class="dt">nsmall =</span> <span class="dv">1</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">spread</span>(human, Mean) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">      </span><span class="kw">mutate</span>(<span class="dt">Variable =</span> name) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">select</span>(Variable, Yes, No)
+    temp &lt;-<span class="st"> </span><span class="kw">rbind</span>(temp, row)
+  }
+  temp
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">table[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, ] &lt;-<span class="st"> </span><span class="kw">my_stats</span>(height, mass, birth_year)            <span class="co"># Notice that we no longer need to us quo</span></code></pre></div>
+<hr />
+<H2 id="quirks">
+Other Quirks and Lessons Learned
+</H2>
+<hr />
+<p><a href="#toc">TOC</a></p>
+<div id="when-doesnt-work" class="section level3">
+<h3>When !! doesn’t work</h3>
+<p>I’ve noticed that using <code>!!</code> doesn’t always work. At this point, I’m not exactly sure the rules related to when it works and when it doesn’t work, but I do want to write down some examples and fixes.</p>
+<p>Sometimes it’s my fault:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var, ...) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)
+  
+  <span class="kw">print</span>(<span class="op">!!</span>x) <span class="co"># This doesn't work - need to associate the quoture variable with its data frame</span>
+}
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
+<span class="co">#&gt; Error in !x: invalid argument type</span></code></pre></div>
+<p>Fix:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var, ...) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">!!</span>x) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">print</span>()
+}
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
+<span class="co">#&gt; # A tibble: 87 x 1</span>
+<span class="co">#&gt;       hair_color</span>
+<span class="co">#&gt;            &lt;chr&gt;</span>
+<span class="co">#&gt;  1         blond</span>
+<span class="co">#&gt;  2          &lt;NA&gt;</span>
+<span class="co">#&gt;  3          &lt;NA&gt;</span>
+<span class="co">#&gt;  4          none</span>
+<span class="co">#&gt;  5         brown</span>
+<span class="co">#&gt;  6   brown, grey</span>
+<span class="co">#&gt;  7         brown</span>
+<span class="co">#&gt;  8          &lt;NA&gt;</span>
+<span class="co">#&gt;  9         black</span>
+<span class="co">#&gt; 10 auburn, white</span>
+<span class="co">#&gt; # ... with 77 more rows</span></code></pre></div>
+</div>
+<div id="unquoting-inside-non-dplyr-functions" class="section level3">
+<h3>Unquoting inside non-dplyr functions</h3>
+<p>I’ve notice some weirdness when trying to unquote quotures inside functions that are inside dplyr functions. For example, if_else inside of mutate.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">hair_color =</span> <span class="kw">if_else</span>(<span class="op">!!</span>x <span class="op">==</span><span class="st"> &quot;yellow&quot;</span>, <span class="st">&quot;blond&quot;</span>, <span class="op">!!</span>x))
+}
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
+<span class="co">#&gt; Error in mutate_impl(.data, dots): Evaluation error: `false` must be length 1 (length of `condition`), not 87.</span></code></pre></div>
+<p>Fix:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">hair_color =</span> <span class="kw">if_else</span>(rlang<span class="op">::</span><span class="kw">UQ</span>(x) <span class="op">==</span><span class="st"> &quot;yellow&quot;</span>, <span class="st">&quot;blond&quot;</span>, rlang<span class="op">::</span><span class="kw">UQ</span>(x)))
+}
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
+<span class="co">#&gt; # A tibble: 87 x 13</span>
+<span class="co">#&gt;                  name height  mass    hair_color  skin_color eye_color</span>
+<span class="co">#&gt;                 &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;         &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;</span>
+<span class="co">#&gt;  1     Luke Skywalker    172    77         blond        fair      blue</span>
+<span class="co">#&gt;  2              C-3PO    167    75          &lt;NA&gt;        gold    yellow</span>
+<span class="co">#&gt;  3              R2-D2     96    32          &lt;NA&gt; white, blue       red</span>
+<span class="co">#&gt;  4        Darth Vader    202   136          none       white    yellow</span>
+<span class="co">#&gt;  5        Leia Organa    150    49         brown       light     brown</span>
+<span class="co">#&gt;  6          Owen Lars    178   120   brown, grey       light      blue</span>
+<span class="co">#&gt;  7 Beru Whitesun lars    165    75         brown       light      blue</span>
+<span class="co">#&gt;  8              R5-D4     97    32          &lt;NA&gt;  white, red       red</span>
+<span class="co">#&gt;  9  Biggs Darklighter    183    84         black       light     brown</span>
+<span class="co">#&gt; 10     Obi-Wan Kenobi    182    77 auburn, white        fair blue-gray</span>
+<span class="co">#&gt; # ... with 77 more rows, and 7 more variables: birth_year &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   gender &lt;chr&gt;, homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,</span>
+<span class="co">#&gt; #   vehicles &lt;list&gt;, starships &lt;list&gt;</span></code></pre></div>
+</div>
+<div id="using-a-quoture-to-create-variable-name-in-mutate" class="section level3">
+<h3>Using a quoture to create variable name in mutate</h3>
+<p>Additionally, sometimes there is some trickiness to naming (or overwriting) a variable name inside of mutate.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="op">!!</span><span class="dt">x =</span> <span class="kw">if_else</span>(rlang<span class="op">::</span><span class="kw">UQ</span>(x) <span class="op">==</span><span class="st"> &quot;yellow&quot;</span>, <span class="st">&quot;blond&quot;</span>, rlang<span class="op">::</span><span class="kw">UQ</span>(x)))
+}
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
+<span class="co">#&gt; Error: &lt;text&gt;:5:16: unexpected '='</span>
+<span class="co">#&gt; 4:   df %&gt;% </span>
+<span class="co">#&gt; 5:     mutate(!!x =</span>
+<span class="co">#&gt;                   ^</span></code></pre></div>
+<p>This doesn’t help either:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="op">!!</span>x <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="kw">if_else</span>(rlang<span class="op">::</span><span class="kw">UQ</span>(x) <span class="op">==</span><span class="st"> &quot;yellow&quot;</span>, <span class="st">&quot;blond&quot;</span>, rlang<span class="op">::</span><span class="kw">UQ</span>(x)))
+}
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
+<span class="co">#&gt; Error: LHS must be a name or string</span></code></pre></div>
+<p>Fix:</p>
+<p>Must have !! in front of quo_name(). Must use := instead of =.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="op">!!</span><span class="kw">quo_name</span>(x) <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="kw">if_else</span>(rlang<span class="op">::</span><span class="kw">UQ</span>(x) <span class="op">==</span><span class="st"> &quot;yellow&quot;</span>, <span class="st">&quot;blond&quot;</span>, rlang<span class="op">::</span><span class="kw">UQ</span>(x)))
+}
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
+<span class="co">#&gt; # A tibble: 87 x 13</span>
+<span class="co">#&gt;                  name height  mass    hair_color  skin_color eye_color</span>
+<span class="co">#&gt;                 &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;         &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;</span>
+<span class="co">#&gt;  1     Luke Skywalker    172    77         blond        fair      blue</span>
+<span class="co">#&gt;  2              C-3PO    167    75          &lt;NA&gt;        gold    yellow</span>
+<span class="co">#&gt;  3              R2-D2     96    32          &lt;NA&gt; white, blue       red</span>
+<span class="co">#&gt;  4        Darth Vader    202   136          none       white    yellow</span>
+<span class="co">#&gt;  5        Leia Organa    150    49         brown       light     brown</span>
+<span class="co">#&gt;  6          Owen Lars    178   120   brown, grey       light      blue</span>
+<span class="co">#&gt;  7 Beru Whitesun lars    165    75         brown       light      blue</span>
+<span class="co">#&gt;  8              R5-D4     97    32          &lt;NA&gt;  white, red       red</span>
+<span class="co">#&gt;  9  Biggs Darklighter    183    84         black       light     brown</span>
+<span class="co">#&gt; 10     Obi-Wan Kenobi    182    77 auburn, white        fair blue-gray</span>
+<span class="co">#&gt; # ... with 77 more rows, and 7 more variables: birth_year &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   gender &lt;chr&gt;, homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,</span>
+<span class="co">#&gt; #   vehicles &lt;list&gt;, starships &lt;list&gt;</span></code></pre></div>
+</div>
+<div id="using-a-quoture-to-turn-a-variable-name-into-a-constant-value" class="section level3">
+<h3>Using a quoture to turn a variable name into a constant value</h3>
+<p>When I’m looping over many variables, I often want to create a variable in my output called “characteristic” or “variable” that captures the current variable name as a value.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)                              <span class="co"># Make sure to use enquo here</span>
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarise</span>(
+      <span class="dt">Mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+    ) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">Characteristic =</span> <span class="op">!!</span><span class="kw">quo_name</span>(x)) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Make sure to use !!quo_name()</span>
+<span class="st">    </span><span class="kw">select</span>(Characteristic, Mean)
+}
+
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(height)
+<span class="co">#&gt; # A tibble: 1 x 2</span>
+<span class="co">#&gt;   Characteristic    Mean</span>
+<span class="co">#&gt;            &lt;chr&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1         height 174.358</span></code></pre></div>
+</div>
+<div id="convert-a-string-to-a-quoture" class="section level3">
+<h3>Convert a string to a quoture</h3>
+<p>Here are some useful websites:</p>
+<p><a href="https://github.com/tidyverse/rlang/issues/116" class="uri">https://github.com/tidyverse/rlang/issues/116</a></p>
+<p><a href="https://stackoverflow.com/questions/27975124/pass-arguments-to-dplyr-functions/44594223#44594223" class="uri">https://stackoverflow.com/questions/27975124/pass-arguments-to-dplyr-functions/44594223#44594223</a></p>
+<p><a href="https://stackoverflow.com/questions/44593596/how-to-pass-strings-denoting-expressions-to-dplyr-0-7-verbs/44593617#44593617" class="uri">https://stackoverflow.com/questions/44593596/how-to-pass-strings-denoting-expressions-to-dplyr-0-7-verbs/44593617#44593617</a></p>
+<p>Sometimes, I want to pass a variable name as a string to a function. It then needs to be converted to a quoture for evaluation.</p>
+<div id="simple-example---now-this-works" class="section level4">
+<h4>Simple example - Now this works</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_col &lt;-<span class="st"> </span><span class="kw">names</span>(starwars[<span class="dv">2</span>]) <span class="co"># Have a variable name as a quoted string</span>
+my_col &lt;-<span class="st"> &quot;mass&quot;</span>
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">!!</span>my_col) <span class="co"># Now this works</span>
+<span class="co">#&gt; # A tibble: 87 x 1</span>
+<span class="co">#&gt;     mass</span>
+<span class="co">#&gt;    &lt;dbl&gt;</span>
+<span class="co">#&gt;  1    77</span>
+<span class="co">#&gt;  2    75</span>
+<span class="co">#&gt;  3    32</span>
+<span class="co">#&gt;  4   136</span>
+<span class="co">#&gt;  5    49</span>
+<span class="co">#&gt;  6   120</span>
+<span class="co">#&gt;  7    75</span>
+<span class="co">#&gt;  8    32</span>
+<span class="co">#&gt;  9    84</span>
+<span class="co">#&gt; 10    77</span>
+<span class="co">#&gt; # ... with 77 more rows</span></code></pre></div>
+</div>
+<div id="when-the-string-is-created-inside-the-function" class="section level4">
+<h4>When the string is created inside the function</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">starwars<span class="op">$</span>height_squared &lt;-<span class="st"> </span>starwars<span class="op">$</span>height<span class="op">**</span><span class="dv">2</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)  <span class="co"># First, turn var without the suffix into a quoture - must be first</span>
+  squared &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">quo_name</span>(x), <span class="st">&quot;squared&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>) <span class="co"># Must use quo_name()</span>
+  
+  df <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarise</span>(
+      <span class="dt">Mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>squared, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+    )
+}
+
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(height)
+<span class="co">#&gt; Warning in mean.default(&quot;height_squared&quot;, na.rm = TRUE): argument is not</span>
+<span class="co">#&gt; numeric or logical: returning NA</span>
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;    Mean</span>
+<span class="co">#&gt;   &lt;dbl&gt;</span>
+<span class="co">#&gt; 1    NA</span></code></pre></div>
+<p>Fix (Method prefered by Hadley and Lionel):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)  <span class="co"># First, turn var without the suffix into a quoture - must be first</span>
+  squared &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">quo_name</span>(x), <span class="st">&quot;squared&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>) <span class="co"># Must use quo_name()</span>
+  squared &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(squared) <span class="co"># Wrap with sym()</span>
+
+  df <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarise</span>(
+      <span class="dt">Mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>squared, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+    )
+}
+
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(height)
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;       Mean</span>
+<span class="co">#&gt;      &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 31594.78</span></code></pre></div>
+<p>Or:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)  <span class="co"># First, turn var without the suffix into a quoture - must be first</span>
+  squared &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">quo_name</span>(x), <span class="st">&quot;squared&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>) <span class="co"># Must use quo_name()</span>
+  squared &lt;-<span class="st"> </span><span class="kw">as.name</span>(squared) <span class="co"># Wrap with as.name()</span>
+
+  df <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarise</span>(
+      <span class="dt">Mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>squared, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+    )
+}
+
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(height)
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;       Mean</span>
+<span class="co">#&gt;      &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 31594.78</span></code></pre></div>
+<p>Or:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
+  
+  x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)  <span class="co"># First, turn var without the suffix into a quoture - must be first</span>
+  squared &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="kw">quo_name</span>(x), <span class="st">&quot;squared&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>) <span class="co"># Must use quo_name()</span>
+  squared &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">parse_quosure</span>(squared) <span class="co"># Wrap with parse_quosure</span>
+
+  df <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarise</span>(
+      <span class="dt">Mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>squared, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+    )
+}
+
+starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(height)
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;       Mean</span>
+<span class="co">#&gt;      &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 31594.78</span></code></pre></div>
+</div>
+</div>
+<div id="other-questions-notes-reminders" class="section level3">
+<h3>Other questions / notes / reminders</h3>
+<p>Can we use / improve with map or lapply?</p>
+<hr />
+<pre><code>#&gt; R version 3.4.2 (2017-09-28)
+#&gt; Platform: x86_64-apple-darwin15.6.0 (64-bit)
+#&gt; Running under: macOS High Sierra 10.13.1
+#&gt; 
+#&gt; Matrix products: default
+#&gt; BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
+#&gt; 
+#&gt; locale:
+#&gt; [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+#&gt; 
+#&gt; attached base packages:
+#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
+#&gt; 
+#&gt; other attached packages:
+#&gt;  [1] bindrcpp_0.2    forcats_0.2.0   stringr_1.2.0   dplyr_0.7.4    
+#&gt;  [5] purrr_0.2.4     readr_1.1.1     tidyr_0.7.2     tibble_1.3.4   
+#&gt;  [9] ggplot2_2.2.1   tidyverse_1.2.1
+#&gt; 
+#&gt; loaded via a namespace (and not attached):
+#&gt;  [1] Rcpp_0.12.13     cellranger_1.1.0 compiler_3.4.2   plyr_1.8.4      
+#&gt;  [5] bindr_0.1        tools_3.4.2      digest_0.6.12    lubridate_1.7.1 
+#&gt;  [9] jsonlite_1.5     evaluate_0.10.1  memoise_1.1.0    nlme_3.1-131    
+#&gt; [13] gtable_0.2.0     lattice_0.20-35  pkgconfig_2.0.1  rlang_0.1.4     
+#&gt; [17] psych_1.7.8      cli_1.0.0        rstudioapi_0.7   yaml_2.1.14     
+#&gt; [21] parallel_3.4.2   haven_1.1.0      xml2_1.1.1       httr_1.3.1      
+#&gt; [25] withr_2.0.0      knitr_1.17       hms_0.3          devtools_1.13.3 
+#&gt; [29] tidyselect_0.2.2 rprojroot_1.2    grid_3.4.2       glue_1.2.0      
+#&gt; [33] R6_2.2.2         readxl_1.0.0     foreign_0.8-69   rmarkdown_1.8   
+#&gt; [37] modelr_0.1.1     reshape2_1.4.2   magrittr_1.5     scales_0.5.0    
+#&gt; [41] backports_1.1.0  htmltools_0.3.6  rvest_0.3.2      assertthat_0.2.0
+#&gt; [45] mnormt_1.5-5     colorspace_1.3-2 stringi_1.1.5    lazyeval_0.2.0  
+#&gt; [49] munsell_0.4.3    broom_0.4.2      crayon_1.3.4</code></pre>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
