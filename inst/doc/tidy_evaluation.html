@@ -69,16 +69,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tidy Evaluation</h1>
 <h4 class="author"><em>Brad Cannell</em></h4>
-<h4 class="date"><em>Created: 2017-06-24 <br> Updated: 2017-11-23</em></h4>
+<h4 class="date"><em>Created: 2017-06-24 <br> Updated: 2017-12-07</em></h4>
 
 
 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
 <span class="co">#&gt; ── Attaching packages ─────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</span>
-<span class="co">#&gt; ✔ ggplot2 2.2.1     ✔ purrr   0.2.4</span>
-<span class="co">#&gt; ✔ tibble  1.3.4     ✔ dplyr   0.7.4</span>
-<span class="co">#&gt; ✔ tidyr   0.7.2     ✔ stringr 1.2.0</span>
-<span class="co">#&gt; ✔ readr   1.1.1     ✔ forcats 0.2.0</span>
+<span class="co">#&gt; ✔ ggplot2 2.2.1.9000     ✔ purrr   0.2.4     </span>
+<span class="co">#&gt; ✔ tibble  1.3.4          ✔ dplyr   0.7.4     </span>
+<span class="co">#&gt; ✔ tidyr   0.7.2          ✔ stringr 1.2.0     </span>
+<span class="co">#&gt; ✔ readr   1.1.1          ✔ forcats 0.2.0</span>
 <span class="co">#&gt; ── Conflicts ────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──</span>
 <span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span>
 <span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span>
@@ -630,7 +630,7 @@ starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 <hr />
 <pre><code>#&gt; R version 3.4.2 (2017-09-28)
 #&gt; Platform: x86_64-apple-darwin15.6.0 (64-bit)
-#&gt; Running under: macOS High Sierra 10.13.1
+#&gt; Running under: macOS High Sierra 10.13.2
 #&gt; 
 #&gt; Matrix products: default
 #&gt; BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
@@ -643,24 +643,29 @@ starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt;  [1] bindrcpp_0.2    forcats_0.2.0   stringr_1.2.0   dplyr_0.7.4    
-#&gt;  [5] purrr_0.2.4     readr_1.1.1     tidyr_0.7.2     tibble_1.3.4   
-#&gt;  [9] ggplot2_2.2.1   tidyverse_1.2.1
+#&gt;  [1] bindrcpp_0.2       forcats_0.2.0      stringr_1.2.0     
+#&gt;  [4] dplyr_0.7.4        purrr_0.2.4        readr_1.1.1       
+#&gt;  [7] tidyr_0.7.2        tibble_1.3.4       ggplot2_2.2.1.9000
+#&gt; [10] tidyverse_1.2.1   
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
-#&gt;  [1] Rcpp_0.12.13     cellranger_1.1.0 compiler_3.4.2   plyr_1.8.4      
-#&gt;  [5] bindr_0.1        tools_3.4.2      digest_0.6.12    lubridate_1.7.1 
-#&gt;  [9] jsonlite_1.5     evaluate_0.10.1  memoise_1.1.0    nlme_3.1-131    
-#&gt; [13] gtable_0.2.0     lattice_0.20-35  pkgconfig_2.0.1  rlang_0.1.4     
-#&gt; [17] psych_1.7.8      cli_1.0.0        rstudioapi_0.7   yaml_2.1.14     
-#&gt; [21] parallel_3.4.2   haven_1.1.0      xml2_1.1.1       httr_1.3.1      
-#&gt; [25] withr_2.0.0      knitr_1.17       hms_0.3          devtools_1.13.3 
-#&gt; [29] tidyselect_0.2.2 rprojroot_1.2    grid_3.4.2       glue_1.2.0      
-#&gt; [33] R6_2.2.2         readxl_1.0.0     foreign_0.8-69   rmarkdown_1.8   
-#&gt; [37] modelr_0.1.1     reshape2_1.4.2   magrittr_1.5     backports_1.1.0 
-#&gt; [41] scales_0.5.0     htmltools_0.3.6  rvest_0.3.2      assertthat_0.2.0
-#&gt; [45] mnormt_1.5-5     colorspace_1.3-2 stringi_1.1.5    lazyeval_0.2.0  
-#&gt; [49] munsell_0.4.3    broom_0.4.2      crayon_1.3.4</code></pre>
+#&gt;  [1] Rcpp_0.12.14      cellranger_1.1.0  compiler_3.4.2   
+#&gt;  [4] plyr_1.8.4        bindr_0.1         tools_3.4.2      
+#&gt;  [7] digest_0.6.12     lubridate_1.7.1   jsonlite_1.5     
+#&gt; [10] evaluate_0.10.1   memoise_1.1.0     nlme_3.1-131     
+#&gt; [13] gtable_0.2.0      lattice_0.20-35   pkgconfig_2.0.1  
+#&gt; [16] rlang_0.1.4       psych_1.7.8       cli_1.0.0        
+#&gt; [19] rstudioapi_0.7    yaml_2.1.14       parallel_3.4.2   
+#&gt; [22] haven_1.1.0       xml2_1.1.1        httr_1.3.1       
+#&gt; [25] withr_2.1.0.9000  knitr_1.17        hms_0.3          
+#&gt; [28] devtools_1.13.3   tidyselect_0.2.2  rprojroot_1.2    
+#&gt; [31] grid_3.4.2        glue_1.2.0        R6_2.2.2         
+#&gt; [34] readxl_1.0.0      foreign_0.8-69    rmarkdown_1.8    
+#&gt; [37] modelr_0.1.1      reshape2_1.4.2    magrittr_1.5     
+#&gt; [40] backports_1.1.0   scales_0.5.0.9000 htmltools_0.3.6  
+#&gt; [43] rvest_0.3.2       assertthat_0.2.0  mnormt_1.5-5     
+#&gt; [46] colorspace_1.3-2  stringi_1.1.5     lazyeval_0.2.1   
+#&gt; [49] munsell_0.4.3     broom_0.4.2       crayon_1.3.4</code></pre>
 </div>
 
 

@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
 
 [//]: (Eventually, I may want to link to CSS and make this more attractive)
 
+# Look into using the [usethis](https://github.com/r-lib/usethis) package to create your next package.
+
 ### Some useful websites:
 <a href = "http://r-pkgs.had.co.nz" target = "_blank">Hadley's Wickham's Packages Book</a>   
 <a href = "http://rmflight.github.io/posts/2014/07/vignetteAnalysis.html" target = "_blank">Robert Flight's Blog</a>   
