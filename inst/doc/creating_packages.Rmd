@@ -223,6 +223,16 @@ To use roxygen:
 
 &nbsp;
 
+#### To prevent error duing R CMD check
+
+Add something similar to the following to the first line in your function:
+
+```{r}
+# Prevents R CMD check: "no visible binding for global variable ‘.’"
+percent = lcl = ucl = n = percent_95 = n_percent = NULL
+```
+
+
 #### Documenting Data:
 
 If you have included a data set, you must also document that data set. <a href = "http://r-pkgs.had.co.nz/data.html" target = "_blank">More information is available from Hadley here</a>.

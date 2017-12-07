@@ -96,6 +96,10 @@ knitr::opts_chunk$set(
 #  #' "range", "sd", "var", "cv", "sem", "skew", "kurt", "p1", "p5", "p10",
 #  #' "p25", "p50", "median", "p75", "p90", "p95", "p99", "iqr", "q"))
 
+## ------------------------------------------------------------------------
+# Prevents R CMD check: "no visible binding for global variable ‘.’"
+percent = lcl = ucl = n = percent_95 = n_percent = NULL
+
 ## ----eval = FALSE--------------------------------------------------------
 #  URL: https://github.com/mbcann01/dataclean
 #  BugReports: https://github.com/mbcann01/dataclean/issues

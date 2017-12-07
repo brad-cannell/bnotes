@@ -241,6 +241,12 @@ Imports<span class="op">:</span>
 <span class="co">#' &quot;p25&quot;, &quot;p50&quot;, &quot;median&quot;, &quot;p75&quot;, &quot;p90&quot;, &quot;p95&quot;, &quot;p99&quot;, &quot;iqr&quot;, &quot;q&quot;))</span></code></pre></div>
 <p> </p>
 </div>
+<div id="to-prevent-error-duing-r-cmd-check" class="section level4">
+<h4>To prevent error duing R CMD check</h4>
+<p>Add something similar to the following to the first line in your function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prevents R CMD check: &quot;no visible binding for global variable ‘.’&quot;</span>
+percent =<span class="st"> </span>lcl =<span class="st"> </span>ucl =<span class="st"> </span>n =<span class="st"> </span>percent_<span class="dv">95</span> =<span class="st"> </span>n_percent =<span class="st"> </span><span class="ot">NULL</span></code></pre></div>
+</div>
 <div id="documenting-data" class="section level4">
 <h4>Documenting Data:</h4>
 <p>If you have included a data set, you must also document that data set. <a href="http://r-pkgs.had.co.nz/data.html" target="_blank">More information is available from Hadley here</a>.</p>
