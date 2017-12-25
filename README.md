@@ -14,6 +14,8 @@ In addition to creating vignettes that can be viewed inside of RStudio, I also c
 
 * [Tidy evaluation: Prgraming with dplyr](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/tidy_evaluation.html)
 
+* [Timezone: Edit time zone in .Rmd file](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/timezone.html)
+
 ## Simulation vignettes
 
 ## Data wrangling vignettes
@@ -21,6 +23,8 @@ In addition to creating vignettes that can be viewed inside of RStudio, I also c
 ## Data analysis vignettes
 
 ## Presentation and dissemination vignettes
+
+* [CSS: Customizing CSS in R markdown](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/css.html)
 
 * [Table of Contents in markdown files](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/table_of_contents.html)
 

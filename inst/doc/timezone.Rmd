@@ -1,0 +1,61 @@
+---
+title: "Set time zone in R markdown"
+author: "Brad Cannell"
+date: "Created: 2017-12-24 <br> Updated: `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{timezone}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+Sys.setenv(TZ = "US/Central")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Adding a timezone to an Rmd files
+
+For awhile I was getting a weird warning message:
+
+`Warning message:
+In as.POSIXlt.POSIXct(x, tz) : unknown timezone 'default/America/Chicago'`
+
+To fix I used info from a mix of the following websites:
+
+https://www.r-bloggers.com/doing-away-with-%E2%80%9Cunknown-timezone%E2%80%9D-warnings/
+
+https://stackoverflow.com/questions/4047188/unknown-timezone-name-in-r-strptime-as-posixct
+
+https://stackoverflow.com/questions/24880493/how-to-find-out-r-library-location-in-mac-osx
+
+This code told me what my current system timezone was set to:
+
+```{r}
+Sys.timezone() # Originally returned NA
+```
+
+This code told me where R was installed on my machine:
+
+```{r}
+.Library
+```
+
+Then I looked for the the file "/Library/Frameworks/R.framework/Versions/3.4/Resources/share/zoneinfo" for the most appropriate time zone to use.
+
+I reset the timezone using this code:
+
+```{r}
+Sys.setenv(TZ = "US/Central")
+```
+
+Then I checked again:
+
+```{r}
+Sys.timezone()
+```
+
+Seems to be working for now.

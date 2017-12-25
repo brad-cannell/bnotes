@@ -1,0 +1,92 @@
+---
+title: "Customizing CSS in R markdown"
+author: "Brad Cannell"
+date: "Created: 2017-12-24 <br> Updated: `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{css}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+Sys.setenv(TZ = "US/Central")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Useful websites:
+
+[R markdown documentation on HTML documents](http://rmarkdown.rstudio.com/html_document_format.html)
+
+[Useful Stack Overflow page about inline CSS](https://stackoverflow.com/questions/34022558/r-markdown-how-to-change-style-with-internal-css)
+
+# External CSS file
+
+For extensive customization it's probably best to create a CSS file and save it in the same directory as the .Rmd file you want to apply it to. Finally, reference the CSS file in the YAML header like so:
+
+```{html}
+---
+title: "Great Title"
+output:
+  html_document:
+    css: styles.css
+---
+```
+
+If you want to provide all of the styles for the document from your own CSS you set the theme (and potentially highlight) to null:
+
+```{html}
+---
+title: "Great Title"
+output:
+  html_document:
+    theme: null
+    highlight: null
+    css: styles.css
+---
+```
+
+# Using the style tag
+
+You can also embed a style tag in the .Rmd document. It's not necessary, but probably best practice to put it directly below the YAML header. The example below changes the horizontal rule to blue, the left border of block quotes to blue, changes the font size of block quotes, and italicizes the text in block quotes.
+
+```{css}
+<style>
+  hr 
+  {
+    background-color: #66b3ff;
+    height: 1px;
+  }
+  blockquote
+  {
+    font-size: 12pt;
+    font-style: italic;
+    border-left: 4px solid #66b3ff;
+  }
+</style>
+```
+
+<h1 style="color: red;"> 
+Inline styling method 1 
+</h1>
+
+The header for "Inline styling method 1" was created with the following inline styling:
+
+```{css}
+<h1 style="color: red;"> 
+Inline styling method 1 
+</h1>
+```
+
+# Inline styling method 2 {style="color: green;"}
+
+The header for "Inline styling method 2" was created with the following inline styling:
+
+```{css}
+# Inline styling method 2 {style="color: green;"}
+```
+
+Notice it changes the color of all font below to green. I could potentially fix this if I wanted to spend more time on it.

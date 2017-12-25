@@ -13,10 +13,48 @@
 <meta name="author" content="Brad Cannell" />
 
 
-<title>Table of Contents</title>
+<title>Set time zone in R markdown</title>
 
 
 
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
 
 
 
@@ -29,77 +67,33 @@
 
 
 
-<h1 class="title toc-ignore">Table of Contents</h1>
+<h1 class="title toc-ignore">Set time zone in R markdown</h1>
 <h4 class="author"><em>Brad Cannell</em></h4>
-<h4 class="date"><em>Created: 2017-07-26 <br> Updated: 2017-12-24</em></h4>
+<h4 class="date"><em>Created: 2017-12-24 <br> Updated: 2017-12-24</em></h4>
 
 
 
-<p>I often want to create a table of contents at the top of an html (markdown) document that allows me to quickly jump to a specific section of the page.</p>
-<div id="top" class="section level1">
-<h1>Table of Contents</h1>
-</div>
-<div id="toc" class="section level1">
-<h1>Table of Contents 2</h1>
-<hr />
-<ol style="list-style-type: decimal">
-<li><p><a href="#intro">Introduction</a></p></li>
-<li><p><a href="#methods">Methods</a></p></li>
-<li><p><a href="#results">Results</a></p></li>
-<li><p><a href="#conclusions">Conclusions</a></p></li>
-</ol>
-<p><strong>Remember: You must put a horizonal rule after headings</strong></p>
-<p>If you don’t, links and bullets won’t work properly.</p>
-<p><strong>To set an attribute</strong> use curly braces.</p>
-<p><strong>To link to an attribute</strong> use brackets and parentheses</p>
-<p><strong>Weird little quirk</strong> about adding attributes (ids) to headers. If you use the id #toc, in the underlying html Pandoc will automatically change it to table-of-contents.</p>
-<p>Above, I create one header with the #toc id and one with the #top id. Below, the introduction and methods sections are linked to #table-of-contents. This seems to work fine.</p>
-<p><strong>Weird little quirk number 2.</strong> It looks like #top has a special meaning as well. Above, I have another header with the #top id. The results section below is linked to the #top id. However, when you render this page and click the “Top” link, it jumps to the top of the page, not to the header I created.</p>
-<p><strong>Weird little quirk number 3.</strong> It looks like you don’t even have to set an id attribute using curly braces. Every time you create a header, markdown will automatically create a new div with an id that is the same as the header name, set to lower case, with dashes in place of spaces. For example:</p>
-<p>Header 1 should automatically be given a div with an id = header-1. You should be able to link to that header using <code>[My first section](#header-1)</code></p>
-<hr />
-<H2 id="intro">
-Introduction
-</H2>
-<hr />
-<p><a href="#table-of-contents">TOC</a></p>
-<p>Here is my introduction section…</p>
-<hr />
-<H2 id="methods">
-Methods
-</H2>
-<p><a href="#table-of-contents">TOC</a></p>
-<hr />
-<p>Here is my methods section…</p>
-<p>Left the link above broken on purpose for illustration.</p>
-<hr />
-<div id="results" class="section level2">
-<h2>Results</h2>
-<hr />
-<p><a href="#top">TOC</a></p>
-<p>Notice here I use #top instead of #table-of-contents</p>
-<hr />
-<pre><code>#&gt; R version 3.4.3 (2017-11-30)
-#&gt; Platform: x86_64-apple-darwin15.6.0 (64-bit)
-#&gt; Running under: macOS High Sierra 10.13.2
-#&gt; 
-#&gt; Matrix products: default
-#&gt; BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
-#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/3.4/Resources/lib/libRlapack.dylib
-#&gt; 
-#&gt; locale:
-#&gt; [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-#&gt; 
-#&gt; attached base packages:
-#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
-#&gt; 
-#&gt; loaded via a namespace (and not attached):
-#&gt;  [1] compiler_3.4.3   backports_1.1.0  magrittr_1.5     rprojroot_1.2   
-#&gt;  [5] htmltools_0.3.6  tools_3.4.3      withr_2.1.0.9000 yaml_2.1.14     
-#&gt;  [9] memoise_1.1.0    Rcpp_0.12.14     stringi_1.1.5    rmarkdown_1.8   
-#&gt; [13] knitr_1.17       stringr_1.2.0    digest_0.6.12    devtools_1.13.3 
-#&gt; [17] evaluate_0.10.1</code></pre>
-</div>
+<div id="adding-a-timezone-to-an-rmd-files" class="section level1">
+<h1>Adding a timezone to an Rmd files</h1>
+<p>For awhile I was getting a weird warning message:</p>
+<p><code>Warning message: In as.POSIXlt.POSIXct(x, tz) : unknown timezone 'default/America/Chicago'</code></p>
+<p>To fix I used info from a mix of the following websites:</p>
+<p><a href="https://www.r-bloggers.com/doing-away-with-%E2%80%9Cunknown-timezone%E2%80%9D-warnings/">https://www.r-bloggers.com/doing-away-with-%E2%80%9Cunknown-timezone%E2%80%9D-warnings/</a></p>
+<p><a href="https://stackoverflow.com/questions/4047188/unknown-timezone-name-in-r-strptime-as-posixct" class="uri">https://stackoverflow.com/questions/4047188/unknown-timezone-name-in-r-strptime-as-posixct</a></p>
+<p><a href="https://stackoverflow.com/questions/24880493/how-to-find-out-r-library-location-in-mac-osx" class="uri">https://stackoverflow.com/questions/24880493/how-to-find-out-r-library-location-in-mac-osx</a></p>
+<p>This code told me what my current system timezone was set to:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Sys.timezone</span>() <span class="co"># Originally returned NA</span>
+<span class="co">#&gt; [1] &quot;US/Central&quot;</span></code></pre></div>
+<p>This code told me where R was installed on my machine:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">.Library
+<span class="co">#&gt; [1] &quot;/Library/Frameworks/R.framework/Resources/library&quot;</span></code></pre></div>
+<p>Then I looked for the the file “/Library/Frameworks/R.framework/Versions/3.4/Resources/share/zoneinfo” for the most appropriate time zone to use.</p>
+<p>I reset the timezone using this code:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Sys.setenv</span>(<span class="dt">TZ =</span> <span class="st">&quot;US/Central&quot;</span>)</code></pre></div>
+<p>Then I checked again:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Sys.timezone</span>()
+<span class="co">#&gt; [1] &quot;US/Central&quot;</span></code></pre></div>
+<p>Seems to be working for now.</p>
 </div>
 
 
