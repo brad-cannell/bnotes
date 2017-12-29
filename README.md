@@ -24,6 +24,8 @@ In addition to creating vignettes that can be viewed inside of RStudio, I also c
 
 * [Confidence intervals: Interpretation](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/confidence_intervals.html)
 
+* [P-values: Interpretation](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/p_values.html)
+
 ## Presentation and dissemination vignettes
 
 * [CSS: Customizing CSS in R markdown](https://rawgit.com/brad-cannell/bnotes/master/inst/doc/css.html)

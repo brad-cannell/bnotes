@@ -1,0 +1,108 @@
+---
+title: "Interpretation of P-values"
+author: "Brad Cannell"
+date: "Created: 2017-12-28 <br> Updated: `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{p_values}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+  hr 
+  {
+    background-color: #66b3ff;
+    height: 1px;
+  }
+  blockquote
+  {
+    font-size: 12pt;
+    font-style: italic;
+    border-left: 4px solid #66b3ff;
+  }
+</style>
+
+```{r setup, include = FALSE}
+Sys.setenv(TZ = "US/Central")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+-------------------------------------------------------------------------------
+
+# Bottom Line
+
+Give the point estimate along with the 95% confidence interval. Say NOTHING about statistical significance.
+
+If you do have to discuss a null hypothesis significance test, give the actual p-value (as opposed to p < 0.05) and say nothing about statistical significance. You may also want to consider giving a plot of the p-value function.
+
+-------------------------------------------------------------------------------
+
+# Rationale 
+
+Typically, we are interested in knowing about some characteristic or relationship between characteristics in a defined population of interest. However, it is rarely possible to collect measurements from every member of the population. And, even when it is possible, the study subjects are viewed as a sample of the potential biologic experience of an even broader conceptual population (Rothman, 2008, page 149). 
+
+Therefore, it is standard practice to collect measurement from some subset of our “superpopulation” – a sample – and use the result of an analysis of that data to approximate the result we would have gotten if we had information from the entire superpopulation. But, not all samples produce equally good approximations of the population value of interest. If we had gathered a different sample, we would likely have gotten a different result. This is called sampling variability. 
+
+What we need then, is some measure of how precise our sample estimate is. One way to measure the precision of our measure is with a confidence interval. 
+
+Another related approach is called null value hypothesis testing. Using this approach doesn’t directly provide a measure of precision for the value we observed. Instead, we create a hypothetical situation – a hypothesis – and “test” the compatibility between the value we observed, and the values we would have observed if our hypothetical hypothesis about the superpopulation were actually true. The result of this hypothesis test is the probability (p-value) of observing as much or more discrepancy between the hypothetical data and our actual data as we observed, _if the [null] hypothesis were actually the truth_. 
+
+> Often, a P value is used to determine the presence or absence of statistical significance. Statistical significance is a term that appears laden with meaning, although it tells nothing more than whether the P value is less than some arbitrary value, almost always .05. The term statistically significant and the statement “P < .05” (or whatever level is taken as the threshold for statistical significance) are equivalent. Neither is a good description of the information in the data.
+
+Rothman, Kenneth J.. Epidemiology: An Introduction (pp. 151-152). Oxford University Press. Kindle Edition.
+
+It is important to note that many assumptions are made during this process, and when reality doesn’t align with those assumptions, it’s possible for our results to be misleading. Further, the validity of the null value hypothesis approach relies on the assumption that bias on confounding are completely controlled, which is almost always unrealistic.
+
+For the most part, p-values and null value hypothesis testing is used as a matter of convention, or tradition. However, Rothman, Greenland, Poole, and others argue that null value hypothesis testing does more harm than good. 
+
+-------------------------------------------------------------------------------
+
+# Interpretation of null value hypothesis tests
+    
+The following are frequentist interpretations for null value hypothesis tests taken from relevant texts and peer-reviewed journal articles.
+
+**Epidemiology: An introduction**
+
+> The P value represents the probability, assuming that the null hypothesis is true and the study is free of bias, that the data obtained in the study would demonstrate an association as far from the null hypothesis or farther than what was actually obtained. For example, suppose that a case-control study gives, as an estimate of the relative risk, RR = 2.5. The P value answers this question: What is the probability, if the true RR = 1.0, that a given study may give a result as far as this or farther from 1.0? The P value is the probability, conditional on the null hypothesis, of observing as strong an association as was observed or a stronger one.
+
+Rothman, Kenneth J.. Epidemiology: An Introduction (p. 150). Oxford University Press. Kindle Edition. 
+
+> Because the theoretical requirements are seldom met, a P value usually cannot be taken as a meaningful probability value. Instead, it can be viewed as something less technical: **a measure of relative consistency between the null hypothesis and the data in hand.** A large P value indicates that the data are highly consistent with the null hypothesis, and a low P value indicates that the data are not very consistent with the null hypothesis. More specifically, if a P value were as small as .01, it would mean that the data were not very consistent with the null hypothesis, but a P value as large as .5 would indicate that the data were reasonably consistent with the null hypothesis. Neither of these P values should be interpreted as a strict probability. Neither tells us whether the null hypothesis is correct or not. The ultimate judgment about the correctness of the null hypothesis will depend on the existence of other data and the relative plausibility of the null hypothesis and its alternatives.
+
+Rothman, Kenneth J.. Epidemiology: An Introduction (pp. 150-151). Oxford University Press. Kindle Edition.
+
+> Even the more quantitative P value has a problem, however, because it confounds two important aspects of the data, the strength of the relation between exposure and disease and the precision with which that relation is measured. To have a clear interpretation of data, it is important to be able to separate the information on strength of relation and precision, which is the job that estimation does for us.
+
+Rothman, Kenneth J.. Epidemiology: An Introduction (p. 152). Oxford University Press. Kindle Edition. 
+
+**Greenland and Poole 2010**
+
+> Having stated what a P-value is not, it is now possible to state what a P-value is. **It is the probability of getting data that conflict with the tested hypothesis as much as or more than the observed data conflict with the tested hypothesis, if all three of the following conditions hold:**    
+    (a) The tested hypothesis is correct.     
+    (b) All other assumptions used in computing the P-value are correct. Several key assumptions are discussed below.     
+    (c) “Conflict” with the tested hypothesis is gauged by a particular  measure used  by  the  testing  procedure to compute the P-value. This measure is called the “test statistic.” Examples of test statistics include the t, z, F, and 2 statistics.   
+
+Greenland, S., & Poole, C. (2010). Problems in common interpretations of statistics in scientific articles, expert reports, and testimony. Jurimetrics. Retrieved from http://heinonline.org/hol-cgi-bin/get_pdf.cgi?handle=hein.journals/juraba51&section=10&casa_token=SDbCB9O5GpkAAAAA:UTMWcKFKUZMw490W5aBNZx73Ub9utiWk3Ky1418NZWnxLqoBClAS1kbqARCeCfid0F5ASKriJSqn
+
+&nbsp;
+
+**Modern epidemiology**
+
+> Indeed, because statistical hypothesis testing promotes so much misinterpretation, we recommend avoiding its use in epidemiologic presentations and research reports. Such avoidance requires that P-values (when used) be presented without reference to alpha levels or “statistical significance,” and that careful attention be paid to the confidence interval, especially its width and its endpoints (the confidence limits)
+
+Rothman, Kenneth J. Modern Epidemiology (p. 163). Lippincot (Wolters Kluwer Health). Kindle Edition. 
+
+&nbsp;
+
+**Statistical modeling: A fresh approach**
+
+> The 95% confidence level is standard in contemporary science; it's a convention. For that reason alone, it is a good idea to use 95% so that the people reading your work will tend to interpret things correctly.
+
+Kaplan, D. T. (2017). Statistical modeling: A fresh approach (Second). Project MOSAIC Books.
+
+&nbsp;
+

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Brad Cannell" />
+
+
+<title>Interpretation of P-values</title>
+
+
+
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Interpretation of P-values</h1>
+<h4 class="author"><em>Brad Cannell</em></h4>
+<h4 class="date"><em>Created: 2017-12-28 <br> Updated: 2017-12-29</em></h4>
+
+
+
+<style>
+  hr 
+  {
+    background-color: #66b3ff;
+    height: 1px;
+  }
+  blockquote
+  {
+    font-size: 12pt;
+    font-style: italic;
+    border-left: 4px solid #66b3ff;
+  }
+</style>
+<hr />
+<div id="bottom-line" class="section level1">
+<h1>Bottom Line</h1>
+<p>Give the point estimate along with the 95% confidence interval. Say NOTHING about statistical significance.</p>
+<p>If you do have to discuss a null hypothesis significance test, give the actual p-value (as opposed to p &lt; 0.05) and say nothing about statistical significance. You may also want to consider giving a plot of the p-value function.</p>
+<hr />
+</div>
+<div id="rationale" class="section level1">
+<h1>Rationale</h1>
+<p>Typically, we are interested in knowing about some characteristic or relationship between characteristics in a defined population of interest. However, it is rarely possible to collect measurements from every member of the population. And, even when it is possible, the study subjects are viewed as a sample of the potential biologic experience of an even broader conceptual population (Rothman, 2008, page 149).</p>
+<p>Therefore, it is standard practice to collect measurement from some subset of our “superpopulation” – a sample – and use the result of an analysis of that data to approximate the result we would have gotten if we had information from the entire superpopulation. But, not all samples produce equally good approximations of the population value of interest. If we had gathered a different sample, we would likely have gotten a different result. This is called sampling variability.</p>
+<p>What we need then, is some measure of how precise our sample estimate is. One way to measure the precision of our measure is with a confidence interval.</p>
+<p>Another related approach is called null value hypothesis testing. Using this approach doesn’t directly provide a measure of precision for the value we observed. Instead, we create a hypothetical situation – a hypothesis – and “test” the compatibility between the value we observed, and the values we would have observed if our hypothetical hypothesis about the superpopulation were actually true. The result of this hypothesis test is the probability (p-value) of observing as much or more discrepancy between the hypothetical data and our actual data as we observed, <em>if the [null] hypothesis were actually the truth</em>.</p>
+<blockquote>
+<p>Often, a P value is used to determine the presence or absence of statistical significance. Statistical significance is a term that appears laden with meaning, although it tells nothing more than whether the P value is less than some arbitrary value, almost always .05. The term statistically significant and the statement “P &lt; .05” (or whatever level is taken as the threshold for statistical significance) are equivalent. Neither is a good description of the information in the data.</p>
+</blockquote>
+<p>Rothman, Kenneth J.. Epidemiology: An Introduction (pp. 151-152). Oxford University Press. Kindle Edition.</p>
+<p>It is important to note that many assumptions are made during this process, and when reality doesn’t align with those assumptions, it’s possible for our results to be misleading. Further, the validity of the null value hypothesis approach relies on the assumption that bias on confounding are completely controlled, which is almost always unrealistic.</p>
+<p>For the most part, p-values and null value hypothesis testing is used as a matter of convention, or tradition. However, Rothman, Greenland, Poole, and others argue that null value hypothesis testing does more harm than good.</p>
+<hr />
+</div>
+<div id="interpretation-of-null-value-hypothesis-tests" class="section level1">
+<h1>Interpretation of null value hypothesis tests</h1>
+<p>The following are frequentist interpretations for null value hypothesis tests taken from relevant texts and peer-reviewed journal articles.</p>
+<p><strong>Epidemiology: An introduction</strong></p>
+<blockquote>
+<p>The P value represents the probability, assuming that the null hypothesis is true and the study is free of bias, that the data obtained in the study would demonstrate an association as far from the null hypothesis or farther than what was actually obtained. For example, suppose that a case-control study gives, as an estimate of the relative risk, RR = 2.5. The P value answers this question: What is the probability, if the true RR = 1.0, that a given study may give a result as far as this or farther from 1.0? The P value is the probability, conditional on the null hypothesis, of observing as strong an association as was observed or a stronger one.</p>
+</blockquote>
+<p>Rothman, Kenneth J.. Epidemiology: An Introduction (p. 150). Oxford University Press. Kindle Edition.</p>
+<blockquote>
+<p>Because the theoretical requirements are seldom met, a P value usually cannot be taken as a meaningful probability value. Instead, it can be viewed as something less technical: <strong>a measure of relative consistency between the null hypothesis and the data in hand.</strong> A large P value indicates that the data are highly consistent with the null hypothesis, and a low P value indicates that the data are not very consistent with the null hypothesis. More specifically, if a P value were as small as .01, it would mean that the data were not very consistent with the null hypothesis, but a P value as large as .5 would indicate that the data were reasonably consistent with the null hypothesis. Neither of these P values should be interpreted as a strict probability. Neither tells us whether the null hypothesis is correct or not. The ultimate judgment about the correctness of the null hypothesis will depend on the existence of other data and the relative plausibility of the null hypothesis and its alternatives.</p>
+</blockquote>
+<p>Rothman, Kenneth J.. Epidemiology: An Introduction (pp. 150-151). Oxford University Press. Kindle Edition.</p>
+<blockquote>
+<p>Even the more quantitative P value has a problem, however, because it confounds two important aspects of the data, the strength of the relation between exposure and disease and the precision with which that relation is measured. To have a clear interpretation of data, it is important to be able to separate the information on strength of relation and precision, which is the job that estimation does for us.</p>
+</blockquote>
+<p>Rothman, Kenneth J.. Epidemiology: An Introduction (p. 152). Oxford University Press. Kindle Edition.</p>
+<p><strong>Greenland and Poole 2010</strong></p>
+<blockquote>
+<p>Having stated what a P-value is not, it is now possible to state what a P-value is. <strong>It is the probability of getting data that conflict with the tested hypothesis as much as or more than the observed data conflict with the tested hypothesis, if all three of the following conditions hold:</strong><br />
+(a) The tested hypothesis is correct.<br />
+(b) All other assumptions used in computing the P-value are correct. Several key assumptions are discussed below.<br />
+(c) “Conflict” with the tested hypothesis is gauged by a particular measure used by the testing procedure to compute the P-value. This measure is called the “test statistic.” Examples of test statistics include the t, z, F, and 2 statistics.</p>
+</blockquote>
+<p>Greenland, S., &amp; Poole, C. (2010). Problems in common interpretations of statistics in scientific articles, expert reports, and testimony. Jurimetrics. Retrieved from <a href="http://heinonline.org/hol-cgi-bin/get_pdf.cgi?handle=hein.journals/juraba51&amp;section=10&amp;casa_token=SDbCB9O5GpkAAAAA:UTMWcKFKUZMw490W5aBNZx73Ub9utiWk3Ky1418NZWnxLqoBClAS1kbqARCeCfid0F5ASKriJSqn" class="uri">http://heinonline.org/hol-cgi-bin/get_pdf.cgi?handle=hein.journals/juraba51&amp;section=10&amp;casa_token=SDbCB9O5GpkAAAAA:UTMWcKFKUZMw490W5aBNZx73Ub9utiWk3Ky1418NZWnxLqoBClAS1kbqARCeCfid0F5ASKriJSqn</a></p>
+<p> </p>
+<p><strong>Modern epidemiology</strong></p>
+<blockquote>
+<p>Indeed, because statistical hypothesis testing promotes so much misinterpretation, we recommend avoiding its use in epidemiologic presentations and research reports. Such avoidance requires that P-values (when used) be presented without reference to alpha levels or “statistical significance,” and that careful attention be paid to the confidence interval, especially its width and its endpoints (the confidence limits)</p>
+</blockquote>
+<p>Rothman, Kenneth J. Modern Epidemiology (p. 163). Lippincot (Wolters Kluwer Health). Kindle Edition.</p>
+<p> </p>
+<p><strong>Statistical modeling: A fresh approach</strong></p>
+<blockquote>
+<p>The 95% confidence level is standard in contemporary science; it’s a convention. For that reason alone, it is a good idea to use 95% so that the people reading your work will tend to interpret things correctly.</p>
+</blockquote>
+<p>Kaplan, D. T. (2017). Statistical modeling: A fresh approach (Second). Project MOSAIC Books.</p>
+<p> </p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
