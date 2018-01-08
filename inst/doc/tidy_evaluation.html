@@ -69,19 +69,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tidy Evaluation</h1>
 <h4 class="author"><em>Brad Cannell</em></h4>
-<h4 class="date"><em>Created: 2017-06-24 <br> Updated: 2017-12-29</em></h4>
+<h4 class="date"><em>Created: 2017-06-24 <br> Updated: 2018-01-08</em></h4>
 
 
 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)
-<span class="co">#&gt; ── Attaching packages ─────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</span>
-<span class="co">#&gt; ✔ ggplot2 2.2.1.9000     ✔ purrr   0.2.4     </span>
-<span class="co">#&gt; ✔ tibble  1.3.4          ✔ dplyr   0.7.4     </span>
-<span class="co">#&gt; ✔ tidyr   0.7.2          ✔ stringr 1.2.0     </span>
-<span class="co">#&gt; ✔ readr   1.1.1          ✔ forcats 0.2.0</span>
-<span class="co">#&gt; ── Conflicts ────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──</span>
-<span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span>
-<span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span>
 <span class="kw">data</span>(<span class="st">&quot;starwars&quot;</span>)</code></pre></div>
 <H2 id="toc">
 Table of Contents
@@ -92,6 +84,7 @@ Table of Contents
 <li><p><a href="#key_functions">Key functions</a></p></li>
 <li><p><a href="#for_loop">Example for loop</a></p></li>
 <li><p><a href="#functions">Example user-defined function</a></p></li>
+<li><p><a href="#purrr">Using tidyeval with purrr</a></p></li>
 <li><p><a href="#quirks">Other Quirks and Lessons Learned</a></p></li>
 </ol>
 <hr />
@@ -377,6 +370,100 @@ table[<span class="dv">1</span>, <span class="dv">3</span>] &lt;-<span class="st
 }</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">table[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>, ] &lt;-<span class="st"> </span><span class="kw">my_stats</span>(height, mass, birth_year)            <span class="co"># Notice that we no longer need to us quo</span></code></pre></div>
 <hr />
+<H2 id="purrr">
+Using tidyeval with purrr
+</H2>
+<hr />
+<p><a href="#toc">TOC</a></p>
+<p>I have a situation that I’m a little confused about. I think if I could understand the contrived situation below, then I could figure out my issue.</p>
+<p>Essentially, when I use map(x, function(x) { !!x }) with tidyeval I get the result that I expect. When I try to use the purrr shortcut, i.e., map(x, ~ { !!. }) I get an error. I don’t understand why. If anybody has insight that they care to share, I would really appreciate it!</p>
+<p>A reprex is below:</p>
+<p>This works as expected:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars &lt;-<span class="st"> </span><span class="kw">quos</span>(gender, species)
+
+<span class="kw">map_df</span>(vars, <span class="cf">function</span>(x){
+  starwars <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>(<span class="op">!!</span><span class="st"> </span>x) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarise</span>(<span class="kw">mean</span>(height, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+})
+<span class="co">#&gt; # A tibble: 43 x 3</span>
+<span class="co">#&gt;           gender `mean(height, na.rm = TRUE)`  species</span>
+<span class="co">#&gt;            &lt;chr&gt;                        &lt;dbl&gt;    &lt;chr&gt;</span>
+<span class="co">#&gt;  1        female                     165.4706     &lt;NA&gt;</span>
+<span class="co">#&gt;  2 hermaphrodite                     175.0000     &lt;NA&gt;</span>
+<span class="co">#&gt;  3          male                     179.2373     &lt;NA&gt;</span>
+<span class="co">#&gt;  4          none                     200.0000     &lt;NA&gt;</span>
+<span class="co">#&gt;  5          &lt;NA&gt;                     120.0000     &lt;NA&gt;</span>
+<span class="co">#&gt;  6          &lt;NA&gt;                      79.0000   Aleena</span>
+<span class="co">#&gt;  7          &lt;NA&gt;                     198.0000 Besalisk</span>
+<span class="co">#&gt;  8          &lt;NA&gt;                     198.0000   Cerean</span>
+<span class="co">#&gt;  9          &lt;NA&gt;                     196.0000 Chagrian</span>
+<span class="co">#&gt; 10          &lt;NA&gt;                     168.0000 Clawdite</span>
+<span class="co">#&gt; # ... with 33 more rows</span></code></pre></div>
+<p>I’m not sure why this doesn’t work:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># vars &lt;- quos(gender, species)</span>
+<span class="co"># </span>
+<span class="co"># map_df(vars, ~ {</span>
+<span class="co">#   starwars %&gt;%</span>
+<span class="co">#     group_by(!! .) %&gt;%</span>
+<span class="co">#     summarise(mean(height, na.rm = TRUE))</span>
+<span class="co"># })</span></code></pre></div>
+<p>The answer is to use “.x” instead of “.”:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars &lt;-<span class="st"> </span><span class="kw">quos</span>(gender, species)
+
+<span class="kw">map_df</span>(vars, <span class="op">~</span><span class="st"> </span>{
+  starwars <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">group_by</span>(<span class="op">!!</span><span class="st"> </span>.x) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">summarise</span>(<span class="kw">mean</span>(height, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+})
+<span class="co">#&gt; # A tibble: 43 x 3</span>
+<span class="co">#&gt;           gender `mean(height, na.rm = TRUE)`  species</span>
+<span class="co">#&gt;            &lt;chr&gt;                        &lt;dbl&gt;    &lt;chr&gt;</span>
+<span class="co">#&gt;  1        female                     165.4706     &lt;NA&gt;</span>
+<span class="co">#&gt;  2 hermaphrodite                     175.0000     &lt;NA&gt;</span>
+<span class="co">#&gt;  3          male                     179.2373     &lt;NA&gt;</span>
+<span class="co">#&gt;  4          none                     200.0000     &lt;NA&gt;</span>
+<span class="co">#&gt;  5          &lt;NA&gt;                     120.0000     &lt;NA&gt;</span>
+<span class="co">#&gt;  6          &lt;NA&gt;                      79.0000   Aleena</span>
+<span class="co">#&gt;  7          &lt;NA&gt;                     198.0000 Besalisk</span>
+<span class="co">#&gt;  8          &lt;NA&gt;                     198.0000   Cerean</span>
+<span class="co">#&gt;  9          &lt;NA&gt;                     196.0000 Chagrian</span>
+<span class="co">#&gt; 10          &lt;NA&gt;                     168.0000 Clawdite</span>
+<span class="co">#&gt; # ... with 33 more rows</span></code></pre></div>
+<p>However, I’m not entirely sure why. When I have more time, I’d like to figure this out.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars &lt;-<span class="st"> </span><span class="kw">quos</span>(gender, species)
+
+<span class="kw">map</span>(vars, <span class="cf">function</span>(x) {
+  x
+})
+<span class="co">#&gt; [[1]]</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~gender</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[2]]</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~species</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map</span>(vars, <span class="op">~</span><span class="st"> </span>{
+  rlang<span class="op">::</span><span class="kw">UQ</span>(.)
+})
+<span class="co">#&gt; [[1]]</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~gender</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[2]]</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~species</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map</span>(vars, <span class="op">~</span><span class="st"> </span>{
+  rlang<span class="op">::</span><span class="kw">UQ</span>(.x)
+})
+<span class="co">#&gt; [[1]]</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~gender</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; [[2]]</span>
+<span class="co">#&gt; &lt;quosure: global&gt;</span>
+<span class="co">#&gt; ~species</span></code></pre></div>
+<hr />
 <H2 id="quirks">
 Other Quirks and Lessons Learned
 </H2>
@@ -643,29 +730,24 @@ starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt;  [1] bindrcpp_0.2       forcats_0.2.0      stringr_1.2.0     
-#&gt;  [4] dplyr_0.7.4        purrr_0.2.4        readr_1.1.1       
-#&gt;  [7] tidyr_0.7.2        tibble_1.3.4       ggplot2_2.2.1.9000
-#&gt; [10] tidyverse_1.2.1   
+#&gt;  [1] bnotes_0.1      bindrcpp_0.2    forcats_0.2.0   stringr_1.2.0  
+#&gt;  [5] dplyr_0.7.4     purrr_0.2.4     readr_1.1.1     tidyr_0.7.2    
+#&gt;  [9] tibble_1.3.4    ggplot2_2.2.1   tidyverse_1.2.1
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
-#&gt;  [1] Rcpp_0.12.14      cellranger_1.1.0  compiler_3.4.3   
-#&gt;  [4] plyr_1.8.4        bindr_0.1         tools_3.4.3      
-#&gt;  [7] digest_0.6.12     lubridate_1.7.1   jsonlite_1.5     
-#&gt; [10] evaluate_0.10.1   memoise_1.1.0     nlme_3.1-131     
-#&gt; [13] gtable_0.2.0      lattice_0.20-35   pkgconfig_2.0.1  
-#&gt; [16] rlang_0.1.4       psych_1.7.8       cli_1.0.0        
-#&gt; [19] rstudioapi_0.7    yaml_2.1.14       parallel_3.4.3   
-#&gt; [22] haven_1.1.0       xml2_1.1.1        httr_1.3.1       
-#&gt; [25] withr_2.1.0.9000  knitr_1.17        hms_0.3          
-#&gt; [28] devtools_1.13.3   tidyselect_0.2.2  rprojroot_1.2    
-#&gt; [31] grid_3.4.3        glue_1.2.0        R6_2.2.2         
-#&gt; [34] readxl_1.0.0      foreign_0.8-69    rmarkdown_1.8    
-#&gt; [37] modelr_0.1.1      reshape2_1.4.2    magrittr_1.5     
-#&gt; [40] scales_0.5.0.9000 backports_1.1.0   htmltools_0.3.6  
-#&gt; [43] rvest_0.3.2       assertthat_0.2.0  mnormt_1.5-5     
-#&gt; [46] colorspace_1.3-2  stringi_1.1.5     lazyeval_0.2.1   
-#&gt; [49] munsell_0.4.3     broom_0.4.2       crayon_1.3.4</code></pre>
+#&gt;  [1] tidyselect_0.2.3 reshape2_1.4.2   haven_1.1.0      lattice_0.20-35 
+#&gt;  [5] colorspace_1.3-2 htmltools_0.3.6  yaml_2.1.16      rlang_0.1.6     
+#&gt;  [9] foreign_0.8-69   glue_1.2.0       withr_2.0.0      modelr_0.1.1    
+#&gt; [13] readxl_1.0.0     bindr_0.1        plyr_1.8.4       munsell_0.4.3   
+#&gt; [17] gtable_0.2.0     cellranger_1.1.0 rvest_0.3.2      devtools_1.13.3 
+#&gt; [21] psych_1.7.8      memoise_1.1.0    evaluate_0.10.1  knitr_1.17      
+#&gt; [25] parallel_3.4.3   broom_0.4.2      Rcpp_0.12.13     backports_1.1.0 
+#&gt; [29] scales_0.5.0     jsonlite_1.5     mnormt_1.5-5     hms_0.3         
+#&gt; [33] digest_0.6.13    stringi_1.1.5    rprojroot_1.2    grid_3.4.3      
+#&gt; [37] cli_1.0.0        tools_3.4.3      magrittr_1.5     lazyeval_0.2.0  
+#&gt; [41] crayon_1.3.4     pkgconfig_2.0.1  xml2_1.1.1       lubridate_1.7.1 
+#&gt; [45] assertthat_0.2.0 rmarkdown_1.8    httr_1.3.1       rstudioapi_0.7  
+#&gt; [49] R6_2.2.2         nlme_3.1-131     compiler_3.4.3</code></pre>
 </div>
 
 

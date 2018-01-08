@@ -203,6 +203,50 @@ my_stats <- function(...) {
 ## ------------------------------------------------------------------------
 table[2:4, ] <- my_stats(height, mass, birth_year)            # Notice that we no longer need to us quo
 
+## ------------------------------------------------------------------------
+vars <- quos(gender, species)
+
+map_df(vars, function(x){
+  starwars %>%
+    group_by(!! x) %>%
+    summarise(mean(height, na.rm = TRUE))
+})
+
+## ----error=TRUE----------------------------------------------------------
+# vars <- quos(gender, species)
+# 
+# map_df(vars, ~ {
+#   starwars %>%
+#     group_by(!! .) %>%
+#     summarise(mean(height, na.rm = TRUE))
+# })
+
+## ------------------------------------------------------------------------
+vars <- quos(gender, species)
+
+map_df(vars, ~ {
+  starwars %>%
+    group_by(!! .x) %>%
+    summarise(mean(height, na.rm = TRUE))
+})
+
+## ------------------------------------------------------------------------
+vars <- quos(gender, species)
+
+map(vars, function(x) {
+  x
+})
+
+## ------------------------------------------------------------------------
+map(vars, ~ {
+  rlang::UQ(.)
+})
+
+## ------------------------------------------------------------------------
+map(vars, ~ {
+  rlang::UQ(.x)
+})
+
 ## ----include=FALSE-------------------------------------------------------
 # Load packages and data again - if necessary
 library(tidyverse)

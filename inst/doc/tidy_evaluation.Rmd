@@ -35,7 +35,9 @@ Table of Contents
 
 4. [Example user-defined function](#functions)
 
-5. [Other Quirks and Lessons Learned](#quirks)
+5. [Using tidyeval with purrr](#purrr)
+
+6. [Other Quirks and Lessons Learned](#quirks)
 
 
 
@@ -372,6 +374,86 @@ my_stats <- function(...) {
 
 ```{r}
 table[2:4, ] <- my_stats(height, mass, birth_year)            # Notice that we no longer need to us quo
+```
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------
+
+<H2 id = "purrr"> Using tidyeval with purrr </H2>
+
+-------------------------------------------------------------------------------
+
+[TOC](#toc)
+
+I have a situation that I'm a little confused about. I think if I could understand the contrived situation below, then I could figure out my issue.
+
+Essentially, when I use map(x, function(x) { !!x }) with tidyeval I get the result that I expect. When I try to use the purrr shortcut, i.e., map(x, ~ { !!. }) I get an error. I don't understand why. If anybody has insight that they care to share, I would really appreciate it!
+
+A reprex is below:
+
+This works as expected:
+
+```{r}
+vars <- quos(gender, species)
+
+map_df(vars, function(x){
+  starwars %>%
+    group_by(!! x) %>%
+    summarise(mean(height, na.rm = TRUE))
+})
+```
+
+I'm not sure why this doesn't work:
+
+```{r error=TRUE}
+# vars <- quos(gender, species)
+# 
+# map_df(vars, ~ {
+#   starwars %>%
+#     group_by(!! .) %>%
+#     summarise(mean(height, na.rm = TRUE))
+# })
+```
+
+The answer is to use ".x" instead of ".":
+
+```{r}
+vars <- quos(gender, species)
+
+map_df(vars, ~ {
+  starwars %>%
+    group_by(!! .x) %>%
+    summarise(mean(height, na.rm = TRUE))
+})
+```
+
+However, I'm not entirely sure why. When I have more time, I'd like to figure this out.
+
+```{r}
+vars <- quos(gender, species)
+
+map(vars, function(x) {
+  x
+})
+```
+
+```{r}
+map(vars, ~ {
+  rlang::UQ(.)
+})
+```
+
+```{r}
+map(vars, ~ {
+  rlang::UQ(.x)
+})
 ```
 
 
