@@ -213,6 +213,98 @@ continuous_table <- function(df, x) {
 continuous_table(starwars, height)
 ```
 
+* `rlang::sym()`
+
+    + Takes a string as an input and turns it into a symbol
+
+```{r}
+my_col <- "height"
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(my_col)
+    )
+)
+```
+
+Doesn't work because R will look for a variable named "my_col" in the data frame "starwars".
+
+```{r}
+my_col <- "height"
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(!!my_col)
+    )
+)
+```
+
+Doesn't work because R will try to calculate the mean of the character string "height".
+
+```{r}
+my_col <- rlang::sym("height")
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(!!my_col)
+    )
+)
+```
+
+This looks like what we would type manually.
+
+```{r}
+my_col <- rlang::sym("height")
+starwars %>% 
+  summarize(
+    mean = mean(!!my_col, na.rm = TRUE)
+  )
+```
+
+And it works as expeccted
+
+* `rlang::syms()`
+
+    + Like sym, but can convert multiple strings into a list of symbols
+    
+```{r}
+my_cols <- rlang::syms(c("height", "mass"))
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(!!my_cols)
+    )
+)
+```
+
+Notice that unquoting with !! returns a list of symbols. To unlist them, we must use the splice operator.
+
+```{r}
+my_cols <- rlang::syms(c("height", "mass"))
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(!!!my_cols)
+    )
+)
+```
+
+Of course, to make this meaningful we need to map it over height and mass
+
+```{r}
+my_cols <- rlang::syms(c("height", "mass"))
+
+summarise_avg <- function(data, col) {
+  col <- enquo(col)
+  data %>% 
+    summarise(avg = mean(!!col, na.rm = TRUE))
+}
+
+results <- purrr::map_df(my_cols, summarise_avg, data = starwars)
+results
+```
+
+
 
 
 
@@ -444,17 +536,6 @@ map(vars, function(x) {
 })
 ```
 
-```{r}
-map(vars, ~ {
-  rlang::UQ(.)
-})
-```
-
-```{r}
-map(vars, ~ {
-  rlang::UQ(.x)
-})
-```
 
 
 
@@ -683,6 +764,51 @@ example <- function(df, var) {
 }
 
 starwars %>% example(height)
+```
+
+#### Grouping by all columns in the data frame
+
+Ran into this situation while checking for duplicate rows in APS data (DETECT pilot test)
+
+```{r error=TRUE}
+starwars_2 <- starwars %>% select(-films, -vehicles, -starships) # Remove list columns
+
+starwars_2 %>% 
+  group_by(names(starwars)) %>% 
+  filter(n() > 1) %>% 
+  count() %>% 
+  ungroup() %>% 
+  select(n)
+```
+
+Fix: In this case, we could have used the built-in group_by_all
+
+```{r}
+starwars_2 <- starwars %>% select(-films, -vehicles, -starships) # Remove list columns
+
+starwars_2 %>% 
+  group_by_all() %>% 
+  filter(n() > 1) %>% 
+  count() %>% 
+  ungroup() %>% 
+  select(n)
+```
+
+And, there are no duplicates.
+
+Another, more general solution for using all column names is:
+
+```{r}
+starwars_2 <- starwars %>% select(-films, -vehicles, -starships) # Remove list columns
+
+my_cols <- starwars_2 %>% names() %>% rlang::syms()
+
+starwars_2 %>% 
+  group_by(!!!my_cols) %>% # Remember to use splice '!!!'
+  filter(n() > 1) %>% 
+  count() %>% 
+  ungroup() %>% 
+  select(n)
 ```
 
 ### Other questions / notes / reminders

@@ -99,6 +99,70 @@ continuous_table <- function(df, x) {
 continuous_table(starwars, height)
 
 ## ------------------------------------------------------------------------
+my_col <- "height"
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(my_col)
+    )
+)
+
+## ------------------------------------------------------------------------
+my_col <- "height"
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(!!my_col)
+    )
+)
+
+## ------------------------------------------------------------------------
+my_col <- rlang::sym("height")
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(!!my_col)
+    )
+)
+
+## ------------------------------------------------------------------------
+my_col <- rlang::sym("height")
+starwars %>% 
+  summarize(
+    mean = mean(!!my_col, na.rm = TRUE)
+  )
+
+## ------------------------------------------------------------------------
+my_cols <- rlang::syms(c("height", "mass"))
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(!!my_cols)
+    )
+)
+
+## ------------------------------------------------------------------------
+my_cols <- rlang::syms(c("height", "mass"))
+rlang::qq_show(
+  starwars %>% 
+    summarize(
+      mean(!!!my_cols)
+    )
+)
+
+## ------------------------------------------------------------------------
+my_cols <- rlang::syms(c("height", "mass"))
+
+summarise_avg <- function(data, col) {
+  col <- enquo(col)
+  data %>% 
+    summarise(avg = mean(!!col, na.rm = TRUE))
+}
+
+results <- purrr::map_df(my_cols, summarise_avg, data = starwars)
+results
+
+## ------------------------------------------------------------------------
 starwars <- mutate(starwars, human = if_else(species == "Human", "Yes", "No", NA_character_))
 
 ## ------------------------------------------------------------------------
@@ -235,16 +299,6 @@ vars <- quos(gender, species)
 
 map(vars, function(x) {
   x
-})
-
-## ------------------------------------------------------------------------
-map(vars, ~ {
-  rlang::UQ(.)
-})
-
-## ------------------------------------------------------------------------
-map(vars, ~ {
-  rlang::UQ(.x)
 })
 
 ## ----include=FALSE-------------------------------------------------------
@@ -393,6 +447,38 @@ example <- function(df, var) {
 }
 
 starwars %>% example(height)
+
+## ----error=TRUE----------------------------------------------------------
+starwars_2 <- starwars %>% select(-films, -vehicles, -starships) # Remove list columns
+
+starwars_2 %>% 
+  group_by(names(starwars)) %>% 
+  filter(n() > 1) %>% 
+  count() %>% 
+  ungroup() %>% 
+  select(n)
+
+## ------------------------------------------------------------------------
+starwars_2 <- starwars %>% select(-films, -vehicles, -starships) # Remove list columns
+
+starwars_2 %>% 
+  group_by_all() %>% 
+  filter(n() > 1) %>% 
+  count() %>% 
+  ungroup() %>% 
+  select(n)
+
+## ------------------------------------------------------------------------
+starwars_2 <- starwars %>% select(-films, -vehicles, -starships) # Remove list columns
+
+my_cols <- starwars_2 %>% names() %>% rlang::syms()
+
+starwars_2 %>% 
+  group_by(!!!my_cols) %>% # Remember to use splice '!!!'
+  filter(n() > 1) %>% 
+  count() %>% 
+  ungroup() %>% 
+  select(n)
 
 ## ----echo=FALSE----------------------------------------------------------
 sessionInfo()

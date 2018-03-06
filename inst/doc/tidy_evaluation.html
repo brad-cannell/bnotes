@@ -69,7 +69,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Tidy Evaluation</h1>
 <h4 class="author"><em>Brad Cannell</em></h4>
-<h4 class="date"><em>Created: 2017-06-24 <br> Updated: 2018-01-08</em></h4>
+<h4 class="date"><em>Created: 2017-06-24 <br> Updated: 2018-03-06</em></h4>
 
 
 
@@ -128,8 +128,9 @@ Key Functions
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What does quo() return?</span>
 <span class="kw">quo</span>(species) <span class="co"># Where species is a variable in the Starwars tibble</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~species</span></code></pre></div>
+<span class="co">#&gt; &lt;quosure&gt;</span>
+<span class="co">#&gt;   expr: ^species</span>
+<span class="co">#&gt;   env:  global</span></code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Basic usage of quo() in function</span>
 freq_table &lt;-<span class="st"> </span><span class="cf">function</span>(df, x, ...) {
   df <span class="op">%&gt;%</span><span class="st">                             </span><span class="co"># No quoting and unquoting necessary for the tibble</span>
@@ -177,24 +178,25 @@ freq_table &lt;-<span class="st"> </span><span class="cf">function</span>(df, x,
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What does quos() return?</span>
 <span class="kw">quos</span>(species, name) <span class="co"># Where species and name are variables in the Starwars tibble</span>
 <span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~species</span>
+<span class="co">#&gt; &lt;quosure&gt;</span>
+<span class="co">#&gt;   expr: ^species</span>
+<span class="co">#&gt;   env:  global</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~name</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; attr(,&quot;class&quot;)</span>
-<span class="co">#&gt; [1] &quot;quosures&quot;</span></code></pre></div>
+<span class="co">#&gt; &lt;quosure&gt;</span>
+<span class="co">#&gt;   expr: ^name</span>
+<span class="co">#&gt;   env:  global</span></code></pre></div>
 <p>You can iterate over the list of quotures returned by <code>quos()</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_quos &lt;-<span class="st"> </span><span class="kw">quos</span>(species, name)
 <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">seq_along</span>(my_quos)) {
   <span class="kw">print</span>(my_quos[[i]])
 }
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~species</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~name</span></code></pre></div>
+<span class="co">#&gt; &lt;quosure&gt;</span>
+<span class="co">#&gt;   expr: ^species</span>
+<span class="co">#&gt;   env:  global</span>
+<span class="co">#&gt; &lt;quosure&gt;</span>
+<span class="co">#&gt;   expr: ^name</span>
+<span class="co">#&gt;   env:  global</span></code></pre></div>
 <p>Don’t forget to unquote-splice with <code>!!!</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Basic use of quos() in a for loop</span>
 my_quos &lt;-<span class="st"> </span><span class="kw">quos</span>(species, name)
@@ -259,6 +261,88 @@ continuous_table &lt;-<span class="st"> </span><span class="cf">function</span>(
 <span class="co">#&gt;   mean_height sum_height</span>
 <span class="co">#&gt;         &lt;dbl&gt;      &lt;int&gt;</span>
 <span class="co">#&gt; 1     174.358      14123</span></code></pre></div>
+<ul>
+<li><p><code>rlang::sym()</code></p>
+<ul>
+<li>Takes a string as an input and turns it into a symbol</li>
+</ul></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_col &lt;-<span class="st"> &quot;height&quot;</span>
+rlang<span class="op">::</span><span class="kw">qq_show</span>(
+  starwars <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarize</span>(
+      <span class="kw">mean</span>(my_col)
+    )
+)
+<span class="co">#&gt; starwars %&gt;% summarize(mean(my_col))</span></code></pre></div>
+<p>Doesn’t work because R will look for a variable named “my_col” in the data frame “starwars”.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_col &lt;-<span class="st"> &quot;height&quot;</span>
+rlang<span class="op">::</span><span class="kw">qq_show</span>(
+  starwars <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarize</span>(
+      <span class="kw">mean</span>(<span class="op">!!</span>my_col)
+    )
+)
+<span class="co">#&gt; starwars %&gt;% summarize(mean(&quot;height&quot;))</span></code></pre></div>
+<p>Doesn’t work because R will try to calculate the mean of the character string “height”.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_col &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(<span class="st">&quot;height&quot;</span>)
+rlang<span class="op">::</span><span class="kw">qq_show</span>(
+  starwars <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarize</span>(
+      <span class="kw">mean</span>(<span class="op">!!</span>my_col)
+    )
+)
+<span class="co">#&gt; starwars %&gt;% summarize(mean(height))</span></code></pre></div>
+<p>This looks like what we would type manually.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_col &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">sym</span>(<span class="st">&quot;height&quot;</span>)
+starwars <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summarize</span>(
+    <span class="dt">mean =</span> <span class="kw">mean</span>(<span class="op">!!</span>my_col, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)
+  )
+<span class="co">#&gt; # A tibble: 1 x 1</span>
+<span class="co">#&gt;      mean</span>
+<span class="co">#&gt;     &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 174.358</span></code></pre></div>
+<p>And it works as expeccted</p>
+<ul>
+<li><p><code>rlang::syms()</code></p>
+<ul>
+<li>Like sym, but can convert multiple strings into a list of symbols</li>
+</ul></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_cols &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(<span class="kw">c</span>(<span class="st">&quot;height&quot;</span>, <span class="st">&quot;mass&quot;</span>))
+rlang<span class="op">::</span><span class="kw">qq_show</span>(
+  starwars <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarize</span>(
+      <span class="kw">mean</span>(<span class="op">!!</span>my_cols)
+    )
+)
+<span class="co">#&gt; starwars %&gt;% summarize(mean(&lt;list: height, mass&gt;))</span></code></pre></div>
+<p>Notice that unquoting with !! returns a list of symbols. To unlist them, we must use the splice operator.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_cols &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(<span class="kw">c</span>(<span class="st">&quot;height&quot;</span>, <span class="st">&quot;mass&quot;</span>))
+rlang<span class="op">::</span><span class="kw">qq_show</span>(
+  starwars <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarize</span>(
+      <span class="kw">mean</span>(<span class="op">!!!</span>my_cols)
+    )
+)
+<span class="co">#&gt; starwars %&gt;% summarize(mean(height, mass))</span></code></pre></div>
+<p>Of course, to make this meaningful we need to map it over height and mass</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my_cols &lt;-<span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>(<span class="kw">c</span>(<span class="st">&quot;height&quot;</span>, <span class="st">&quot;mass&quot;</span>))
+
+summarise_avg &lt;-<span class="st"> </span><span class="cf">function</span>(data, col) {
+  col &lt;-<span class="st"> </span><span class="kw">enquo</span>(col)
+  data <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span><span class="kw">summarise</span>(<span class="dt">avg =</span> <span class="kw">mean</span>(<span class="op">!!</span>col, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+}
+
+results &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw">map_df</span>(my_cols, summarise_avg, <span class="dt">data =</span> starwars)
+results
+<span class="co">#&gt; # A tibble: 2 x 1</span>
+<span class="co">#&gt;         avg</span>
+<span class="co">#&gt;       &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 174.35802</span>
+<span class="co">#&gt; 2  97.31186</span></code></pre></div>
 <hr />
 <H2 id="for_loop">
 Example using Tidy Eval in For Loop
@@ -437,32 +521,14 @@ Using tidyeval with purrr
   x
 })
 <span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~gender</span>
+<span class="co">#&gt; &lt;quosure&gt;</span>
+<span class="co">#&gt;   expr: ^gender</span>
+<span class="co">#&gt;   env:  global</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~species</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map</span>(vars, <span class="op">~</span><span class="st"> </span>{
-  rlang<span class="op">::</span><span class="kw">UQ</span>(.)
-})
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~gender</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~species</span></code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">map</span>(vars, <span class="op">~</span><span class="st"> </span>{
-  rlang<span class="op">::</span><span class="kw">UQ</span>(.x)
-})
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~gender</span>
-<span class="co">#&gt; </span>
-<span class="co">#&gt; [[2]]</span>
-<span class="co">#&gt; &lt;quosure: global&gt;</span>
-<span class="co">#&gt; ~species</span></code></pre></div>
+<span class="co">#&gt; &lt;quosure&gt;</span>
+<span class="co">#&gt;   expr: ^species</span>
+<span class="co">#&gt;   env:  global</span></code></pre></div>
 <hr />
 <H2 id="quirks">
 Other Quirks and Lessons Learned
@@ -512,7 +578,22 @@ starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 <span class="st">    </span><span class="kw">mutate</span>(<span class="dt">hair_color =</span> <span class="kw">if_else</span>(<span class="op">!!</span>x <span class="op">==</span><span class="st"> &quot;yellow&quot;</span>, <span class="st">&quot;blond&quot;</span>, <span class="op">!!</span>x))
 }
 starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
-<span class="co">#&gt; Error in mutate_impl(.data, dots): Evaluation error: `false` must be length 1 (length of `condition`), not 87.</span></code></pre></div>
+<span class="co">#&gt; # A tibble: 87 x 13</span>
+<span class="co">#&gt;                  name height  mass    hair_color  skin_color eye_color</span>
+<span class="co">#&gt;                 &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;         &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;</span>
+<span class="co">#&gt;  1     Luke Skywalker    172    77         blond        fair      blue</span>
+<span class="co">#&gt;  2              C-3PO    167    75          &lt;NA&gt;        gold    yellow</span>
+<span class="co">#&gt;  3              R2-D2     96    32          &lt;NA&gt; white, blue       red</span>
+<span class="co">#&gt;  4        Darth Vader    202   136          none       white    yellow</span>
+<span class="co">#&gt;  5        Leia Organa    150    49         brown       light     brown</span>
+<span class="co">#&gt;  6          Owen Lars    178   120   brown, grey       light      blue</span>
+<span class="co">#&gt;  7 Beru Whitesun lars    165    75         brown       light      blue</span>
+<span class="co">#&gt;  8              R5-D4     97    32          &lt;NA&gt;  white, red       red</span>
+<span class="co">#&gt;  9  Biggs Darklighter    183    84         black       light     brown</span>
+<span class="co">#&gt; 10     Obi-Wan Kenobi    182    77 auburn, white        fair blue-gray</span>
+<span class="co">#&gt; # ... with 77 more rows, and 7 more variables: birth_year &lt;dbl&gt;,</span>
+<span class="co">#&gt; #   gender &lt;chr&gt;, homeworld &lt;chr&gt;, species &lt;chr&gt;, films &lt;list&gt;,</span>
+<span class="co">#&gt; #   vehicles &lt;list&gt;, starships &lt;list&gt;</span></code></pre></div>
 <p>Fix:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
   x &lt;-<span class="st"> </span><span class="kw">enquo</span>(var)
@@ -560,7 +641,7 @@ starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 <span class="st">    </span><span class="kw">mutate</span>(<span class="op">!!</span>x <span class="op">:</span><span class="er">=</span><span class="st"> </span><span class="kw">if_else</span>(rlang<span class="op">::</span><span class="kw">UQ</span>(x) <span class="op">==</span><span class="st"> &quot;yellow&quot;</span>, <span class="st">&quot;blond&quot;</span>, rlang<span class="op">::</span><span class="kw">UQ</span>(x)))
 }
 starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">example</span>(hair_color)
-<span class="co">#&gt; Error: LHS must be a name or string</span></code></pre></div>
+<span class="co">#&gt; Error: The LHS of `:=` must be a string or a symbol</span></code></pre></div>
 <p>Fix:</p>
 <p>Must have !! in front of quo_name(). Must use := instead of =.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">example &lt;-<span class="st"> </span><span class="cf">function</span>(df, var) {
@@ -710,6 +791,44 @@ starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 <span class="co">#&gt;      &lt;dbl&gt;</span>
 <span class="co">#&gt; 1 31594.78</span></code></pre></div>
 </div>
+<div id="grouping-by-all-columns-in-the-data-frame" class="section level4">
+<h4>Grouping by all columns in the data frame</h4>
+<p>Ran into this situation while checking for duplicate rows in APS data (DETECT pilot test)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">starwars_<span class="dv">2</span> &lt;-<span class="st"> </span>starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>films, <span class="op">-</span>vehicles, <span class="op">-</span>starships) <span class="co"># Remove list columns</span>
+
+starwars_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(<span class="kw">names</span>(starwars)) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(<span class="kw">n</span>() <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">count</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(n)
+<span class="co">#&gt; Error in mutate_impl(.data, dots): Column `names(starwars)` must be length 87 (the number of rows) or one, not 14</span></code></pre></div>
+<p>Fix: In this case, we could have used the built-in group_by_all</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">starwars_<span class="dv">2</span> &lt;-<span class="st"> </span>starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>films, <span class="op">-</span>vehicles, <span class="op">-</span>starships) <span class="co"># Remove list columns</span>
+
+starwars_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by_all</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(<span class="kw">n</span>() <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">count</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(n)
+<span class="co">#&gt; # A tibble: 0 x 1</span>
+<span class="co">#&gt; # ... with 1 variables: n &lt;int&gt;</span></code></pre></div>
+<p>And, there are no duplicates.</p>
+<p>Another, more general solution for using all column names is:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">starwars_<span class="dv">2</span> &lt;-<span class="st"> </span>starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>films, <span class="op">-</span>vehicles, <span class="op">-</span>starships) <span class="co"># Remove list columns</span>
+
+my_cols &lt;-<span class="st"> </span>starwars_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">names</span>() <span class="op">%&gt;%</span><span class="st"> </span>rlang<span class="op">::</span><span class="kw">syms</span>()
+
+starwars_<span class="dv">2</span> <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(<span class="op">!!!</span>my_cols) <span class="op">%&gt;%</span><span class="st"> </span><span class="co"># Remember to use splice '!!!'</span>
+<span class="st">  </span><span class="kw">filter</span>(<span class="kw">n</span>() <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">count</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">ungroup</span>() <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">select</span>(n)
+<span class="co">#&gt; # A tibble: 0 x 1</span>
+<span class="co">#&gt; # ... with 1 variables: n &lt;int&gt;</span></code></pre></div>
+</div>
 </div>
 <div id="other-questions-notes-reminders" class="section level3">
 <h3>Other questions / notes / reminders</h3>
@@ -717,7 +836,7 @@ starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 <hr />
 <pre><code>#&gt; R version 3.4.3 (2017-11-30)
 #&gt; Platform: x86_64-apple-darwin15.6.0 (64-bit)
-#&gt; Running under: macOS High Sierra 10.13.2
+#&gt; Running under: macOS High Sierra 10.13.3
 #&gt; 
 #&gt; Matrix products: default
 #&gt; BLAS: /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
@@ -730,13 +849,13 @@ starwars <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"
 #&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     
 #&gt; 
 #&gt; other attached packages:
-#&gt;  [1] bnotes_0.1      bindrcpp_0.2    forcats_0.2.0   stringr_1.2.0  
-#&gt;  [5] dplyr_0.7.4     purrr_0.2.4     readr_1.1.1     tidyr_0.7.2    
-#&gt;  [9] tibble_1.3.4    ggplot2_2.2.1   tidyverse_1.2.1
+#&gt;  [1] bindrcpp_0.2    forcats_0.2.0   stringr_1.2.0   dplyr_0.7.4    
+#&gt;  [5] purrr_0.2.4     readr_1.1.1     tidyr_0.7.2     tibble_1.3.4   
+#&gt;  [9] ggplot2_2.2.1   tidyverse_1.2.1
 #&gt; 
 #&gt; loaded via a namespace (and not attached):
 #&gt;  [1] tidyselect_0.2.3 reshape2_1.4.2   haven_1.1.0      lattice_0.20-35 
-#&gt;  [5] colorspace_1.3-2 htmltools_0.3.6  yaml_2.1.16      rlang_0.1.6     
+#&gt;  [5] colorspace_1.3-2 htmltools_0.3.6  yaml_2.1.16      rlang_0.2.0     
 #&gt;  [9] foreign_0.8-69   glue_1.2.0       withr_2.0.0      modelr_0.1.1    
 #&gt; [13] readxl_1.0.0     bindr_0.1        plyr_1.8.4       munsell_0.4.3   
 #&gt; [17] gtable_0.2.0     cellranger_1.1.0 rvest_0.3.2      devtools_1.13.3 
