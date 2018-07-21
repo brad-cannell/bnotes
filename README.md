@@ -1,3 +1,7 @@
+# Update 2018-07-21: 
+
+I don’t really like using/maintaining the bnotes package. I think I’d rather just use a notes folder (maybe as a project) like I used to. The package aspect is extra work for essentially no benefit. I didn’t delete bnotes, but I copied all the files over to my r_notes folder.
+
 # bnotes
 
 This package contains random notes about R code and using R that I created for myself. These notes didn't used to be in a package - they were just a folder full of random bits of code. However, the intent behind putting them into a package is to create vignettes with my notes that I can view from within RStudio even while I'm offline.
